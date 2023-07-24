@@ -5,7 +5,7 @@
 exports.up = function(knex) {
   return knex.schema.createTable('org', table => {
     table.increments('id')
-    table.string('org_name')
+    table.string('name')
   })
 };
 

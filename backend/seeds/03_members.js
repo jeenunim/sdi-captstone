@@ -9,7 +9,8 @@ exports.seed = async function(knex) {
     {
       first_name: 'Bradley', 
       last_name: 'Saltzman', 
-      rank: 'General', 
+      branch_id: 5,
+      rank_id: 20, 
       office_symbol: 'SF/CSO', 
       org_id: 1, 
       supervisor_id: 1, 
