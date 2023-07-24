@@ -66,6 +66,18 @@ app.get('/member/:memberId', (req, res) => {
     })
 })
 
+app.get('/members', (req, res) => {
+  knex('member')
+    .select('*')
+    .then(members => {
+      if (members.length > 0) {
+        res.status(200).send(JSON.stringify(members))
+      } else {
+        res.status(404).send(JSON.stringify({message: 'Members could not be found'}))
+      }
+    })  
+})
+
 // Request a supervisor's subordinates
 app.get('/member/:memberId/subordinates', (req, res) => {
   const memberId = req.params.memberId;
