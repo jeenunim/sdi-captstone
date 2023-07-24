@@ -15,8 +15,6 @@ export default function GoogleMap() {
     // Fetch your API key from an environment variable or any other method you prefer.
     const apiKeyFromEnv = 'AIzaSyAA-NZzwF-O1yjVaWx7KG9KfAoG4sJz_64';
     setApiKey(apiKeyFromEnv);
-
-    // Dynamically load the Google Maps API script
     if (apiKeyFromEnv) {
       loadjs(`https://maps.googleapis.com/maps/api/js?key=${apiKeyFromEnv}&libraries=places`, {
         success: () => {
@@ -29,6 +27,12 @@ export default function GoogleMap() {
         },
       });
     }
+    fetch('http://localhost:8080/user')
+    .then(res => res.json)
+    .then(data => {
+      console.log('user data')
+      console.log(data);
+    })
   }, []);
 
   const codeAddress = (address) => {
@@ -51,7 +55,7 @@ export default function GoogleMap() {
           // If marker exists, update its position
           markers.current[markerIndex].marker.setPosition(updatedCenter);
         } else {
-          const image = '/DeployedMarker.png'
+          const image = '/LeaveMarker.png'
           // If marker doesn't exist, create a new marker
           const newMarker = new window.google.maps.Marker({
             map: mapRef.current,
