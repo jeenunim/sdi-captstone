@@ -1,89 +1,99 @@
-import React from 'react'
-/**
- * @license
- * Copyright 2019 Google LLC. All Rights Reserved.
- * SPDX-License-Identifier: Apache-2.0
- */
-// Initialize and add the map
+import React, { useState, useEffect, useRef } from "react";
+import GoogleMapReact from 'google-map-react';
+import MemberData from "./MemberData";
+import loadjs from 'loadjs';
 
-const GoogleMap = () => {
+export default function GoogleMap() {
+  const [apiKey, setApiKey] = useState(null);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [loadError, setLoadError] = useState(false);
+  const mapRef = useRef(null);
+  const defaultZoom = 4.5;
+  const markers = useRef([]);
 
-let map;
+  useEffect(() => {
+    // Fetch your API key from an environment variable or any other method you prefer.
+    const apiKeyFromEnv = 'AIzaSyAA-NZzwF-O1yjVaWx7KG9KfAoG4sJz_64';
+    setApiKey(apiKeyFromEnv);
 
-async function initMap() {
-  // The location of CONUS
-  //39.8283° N, 98.5795° W
-  const center = { lat: 39.8283, lng: -98.5795 };
-  // Request needed libraries.
-  //@ts-ignore
-  const { Map } = await google.maps.importLibrary("maps");
-  const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+    // Dynamically load the Google Maps API script
+    if (apiKeyFromEnv) {
+      loadjs(`https://maps.googleapis.com/maps/api/js?key=${apiKeyFromEnv}&libraries=places`, {
+        success: () => {
+          setIsLoaded(true);
+          console.log('Google Maps API loaded successfully!');
+        },
+        error: () => {
+          setLoadError(true);
+          console.error('Failed to load Google Maps API');
+        },
+      });
+    }
+  }, []);
 
-  map = new Map(document.getElementById("map"), {
-    zoom: 4,
-    center: center,
-    mapId: "DEMO_MAP_ID",
-  });
-  
-  geocoder = new google.maps.Geocoder();
+  const codeAddress = (address) => {
+    // Check if the geocoder and mapRef are available
+    if (!window.google || !window.google.maps || !mapRef.current) {
+      return;
+    }
 
-const codeAddress = (address) => {
+    const geocoder = new window.google.maps.Geocoder();
 
-    geocoder.geocode( { 'address' : address }, function( results, status ) {
-        if( status == google.maps.GeocoderStatus.OK ) {
+    geocoder.geocode({ 'address': address }, function (results, status) {
+      if (status === window.google.maps.GeocoderStatus.OK) {
+        // Get the updated map center
+        const updatedCenter = results[0].geometry.location;
 
-            //In this case it creates a marker, but you can get the lat and lng from the location.LatLng
-            map.setCenter( results[0].geometry.location );
-            var marker = new google.maps.Marker( {
-                map     : map,
-                position: results[0].geometry.location
-            } );
+        // Check if marker for this address already exists
+        const markerIndex = markers.current.findIndex(marker => marker.address === address);
+
+        if (markerIndex !== -1) {
+          // If marker exists, update its position
+          markers.current[markerIndex].marker.setPosition(updatedCenter);
         } else {
-            alert( 'Geocode was not successful for the following reason: ' + status );
+          const image = '/DeployedMarker.png'
+          // If marker doesn't exist, create a new marker
+          const newMarker = new window.google.maps.Marker({
+            map: mapRef.current,
+            position: updatedCenter,
+            title: address,
+            icon: image
+          });
+
+          // Add the marker to the markers array
+          markers.current.push({ address, marker: newMarker });
         }
-    } );
-}
-  // The marker, positioned at Uluru
-const marker = new AdvancedMarkerElement({
-    map: map,
-    position: {lat: 39.6974, lng: -104.7697},
-    title: "Buckley",
-  });
-  const marker2 = new AdvancedMarkerElement({
-    map: map,
-    position: {lat: 39.69, lng: -114.76},
-    title: "Marker2",
-  });
-    codeAddress('18824 E Baltic Place, Aurora, CO 80013')
-    codeAddress('El Paso, TX')
-    codeAddress('Vandenberg SFB')
-    codeAddress('Doha, Qatar')
-    codeAddress('South Korea')
-}
+      } else {
+        alert('Geocode was not successful for the following reason: ' + status);
+      }
+    });
+  };
 
-initMap();
+  // Check if there was an error loading the Google Maps API
+  if (loadError) {
+    return <div>Error loading Google Maps. Please try again later.</div>;
+  }
 
-return (
+  return (
     <main>
-        <head>
-        <title>Add Map</title>
-        <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
-        {/* <!-- jsFiddle will insert css and js --> */}
-        </head>
-        <body>
-        <h3>My Google Maps Demo</h3>
-        {/* <!--The div element for the map --> */}
-        <div id="map"></div>
-
-        {/* <!-- prettier-ignore --> */}
-            <div>
-            {(g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})
-            ({key: "AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg", v: "beta"})};
-            </div>
-        </body>
+    <div style={{ height: '40vh', width: '100%' }}>
+      {isLoaded && apiKey && (
+        <GoogleMapReact
+          bootstrapURLKeys={{ key: apiKey }}
+          defaultCenter={{ lat: 39.0902, lng: -95.7129 }}
+          defaultZoom={defaultZoom}
+          options={{
+            mapTypeId: 'hybrid'
+          }}
+          onGoogleApiLoaded={({ map }) => (mapRef.current = map)}
+          onChange={({ center }) => {
+            codeAddress('Vandenberg SFB');
+            codeAddress('Peterson SFB');
+          }}
+        />
+      )}
+    </div>
+    <MemberData/>
     </main>
-)
-
+  );
 }
-
-export default GoogleMap
