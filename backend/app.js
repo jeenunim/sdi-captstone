@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const port = 8080;
+const knex = require('knex')(require('./knexfile.js')['development']);
 
 /**
  * @param {string} key - Expected key in req.body
