@@ -10,18 +10,18 @@ const knex = require('knex')(require('./knexfile.js')['development']);
 const guard = (key, type, req, res) => {
   if (key in req.body === false) {
     res.status(400).send(JSON.stringify({error: `Request must include '${key}'.`}));
-    return;
+    return new Error(`Request must include '${key}'.`);
   } else if (typeof(req.body[key]) !== type) {
     res.status(400).send(JSON.stringify({error: `'${key}' must be of type ${type}. Instead got ${typeof(req.body[key])}.`}));
-    return;
+    return new Error(`'${key}' must be of type ${type}. Instead got ${typeof(req.body[key])}.`);
   } else if (typeof(req.body[key]) === 'string' || typeof(req.body[key]) === 'object') {
     if (req.body[key].length === 0) {
       res.status(400).send(JSON.stringify({error: `'${key}' can not be emtpy.`}));
-      return;
+      return new Error(`'${key}' can not be emtpy.`);
     }
   } else if (typeof(req.body[key]) === 'undefined') {
     res.status(400).send(JSON.stringify({error: `'${key}' is undefined.`}));
-    return;
+    return new Error(`'${key}' is undefined.`);
   }
 }
 
@@ -45,9 +45,23 @@ app.post('/sign-up', (req, res) => {
         guard('password', 'string', req, res);
         guard('first_name', 'string', req, res);
         guard('last_name', 'string', req, res);
-        
       }
     })
+    .catch(err => console.log(err))
+})
+
+// Request all members
+app.get('/members', (req, res) => {
+  knex('member')
+    .select('*')
+    .then(members => {
+      if (members.length > 0) {
+        res.status(200).send(JSON.stringify(members));
+      } else {
+        res.status(404).send(JSON.stringify({error: 'Members could not be found'}));
+      }
+    })  
+    .catch(err => console.log(err))
 })
 
 // Request a member
@@ -64,6 +78,7 @@ app.get('/member/:memberId', (req, res) => {
         res.status(404).send(JSON.stringify({error: 'Member not found'}));
       }
     })
+    .catch(err => console.log(err))
 })
 
 // Request a supervisor's subordinates
@@ -73,8 +88,13 @@ app.get('/member/:memberId/subordinates', (req, res) => {
     .select('*')
     .where('supervisor_id', memberId)
     .then(subordinates => {
-      res.status(200).send(JSON.stringify(subordinates))
+      if (subordinates.length > 0) {
+        res.status(200).send(JSON.stringify(subordinates));
+      } else {
+        res.status(404).send(JSON.stringify({error: `Could not find subordinates for supervisor of id '${memberId}'.` }));
+      }
     })
+    .catch(err => console.log(err))
 });
 
 
