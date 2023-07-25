@@ -4,8 +4,8 @@
  */
 exports.up = function(knex) {
     return knex.schema.createTable('branch', table => {
-      table.increments('id')
-      table.string('name')
+      table.increments('id');
+      table.string('name').notNullable();
     })
   };
   

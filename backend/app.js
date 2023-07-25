@@ -2,7 +2,6 @@ const express = require('express');
 const app = express();
 const port = 8080;
 const knex = require('knex')(require('./knexfile.js')['development']);
-const cookieParser = require('cookie-parser');
 
 /**
  * @param {string} key - Expected key in req.body
@@ -10,51 +9,114 @@ const cookieParser = require('cookie-parser');
  */
 const guard = (key, type, req, res) => {
   if (key in req.body === false) {
-    res.status(400).send(JSON.stringify({ error: `Request must include '${key}'.` }));
-    return new Error(`Request must include '${key}'.`);
-  } else if (typeof req.body[key] !== type) {
-    res.status(400).send(JSON.stringify({ error: `'${key}' must be of type ${type}. Instead got ${typeof(req.body[key])}.` }));
-    return new Error(`'${key}' must be of type ${type}. Instead got ${typeof(req.body[key])}.`);
-  } else if (typeof req.body[key] === 'string' || typeof req.body[key] === 'object') {
+    res.status(400).send(JSON.stringify({error: `Request must include '${key}'.`}));
+    return;
+  } else if (typeof(req.body[key]) !== type) {
+    res.status(400).send(JSON.stringify({error: `'${key}' must be of type ${type}. Instead got ${typeof(req.body[key])}.`}));
+    return;
+  } else if (typeof(req.body[key]) === 'string' || typeof(req.body[key]) === 'object') {
     if (req.body[key].length === 0) {
-      res.status(400).send(JSON.stringify({ error: `'${key}' can not be empty.` }));
-      return new Error(`'${key}' can not be empty.`);
+      res.status(400).send(JSON.stringify({error: `'${key}' can not be emtpy.`}));
+      return;
     }
-  } else if (typeof req.body[key] === 'undefined') {
-    res.status(400).send(JSON.stringify({ error: `'${key}' is undefined.` }));
-    return new Error(`'${key}' is undefined.`);
+  } else if (typeof(req.body[key]) === 'undefined') {
+    res.status(400).send(JSON.stringify({error: `'${key}' is undefined.`}));
+    return;
   }
 }
 
+/**
+ * @param {number} memberId Member's database id
+ * @returns {Promise<member>}
+ */
+const ifMemberExists = (memberId) => {
+  const promise = knex('member')
+    .select('*')
+    .where('id', memberId)
+    .then(members => {
+      const memberFound = members.length > 0;
+
+      if (memberFound) {
+        const member = members[0];
+
+        return Promise.resolve(member)
+      } else {
+        return Promise.reject(new Error(`Could not find member of id '${memberId}'`))
+      }
+    })
+  return promise;
+}
+
 app.use(express.json());
-app.use(cookieParser());
 
 app.get('/', (req, res) => {
-  res.status(200).send(JSON.stringify({ message: 'Success!' }));
-});
+  res.status(200).send(JSON.stringify({
+    message: 'Success!'
+  }))
+})
+
+app.post('/login', (req, res) => {
+  const { username, password } = req.body;
+
+  knex('member')
+    .select('*')
+    .where('username', username)
+    .where('password', password)
+    .then(members => {
+      const memberFound = members.length > 0
+      if (memberFound) {
+        const member = members[0];
+
+        res.status(200).send({
+          message: 'Login success', 
+          member: member
+        })
+      } else {
+        res.status(401).send({
+          message: 'Invalid username/password'
+        })
+      }
+    })
+    .catch(err => console.log(err))
+})
 
 app.post('/sign-up', (req, res) => {
   const { username } = req.body;
+
   knex('member')
     .where('username', username)
     .then(members => {
-      const accountFound = members.length > 0;
-      if (accountFound) {
-        res.status(409).send(JSON.stringify({ error: 'An account with that username already exists' }));
+      const memberFound = members.length > 0;
+      if (memberFound) {
+        res.status(409).send(JSON.stringify({
+          error: 'Username taken!'
+        }));
       } else {
-        const newAccount = req.body;
         guard('username', 'string', req, res);
         guard('password', 'string', req, res);
         guard('first_name', 'string', req, res);
         guard('last_name', 'string', req, res);
 
-        // Save the username in the cookie
-        res.cookie('member_username', username, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true });
+        const newMember = req.body;
 
-        res.status(200).send(JSON.stringify({ message: 'Account created successfully' }));
+        knex('member')
+        .insert(newMember, ['*'])
+        .then(members => {
+          // Removing password from account variable before sending back to client
+          const { password, ...member } = members[0];
+          res.status(201).send(JSON.stringify({
+            message: 'Successfully signed up!',
+            member: member
+          }));
+        })
       }
     })
-    .catch(err => console.log(err))
+    .catch(err => {
+      console.log(err)
+      res.status(400).send(JSON.stringify({
+        error: err.message
+      }));
+    })
 })
 
 // Request all members
@@ -63,48 +125,214 @@ app.get('/members', (req, res) => {
     .select('*')
     .then(members => {
       if (members.length > 0) {
-        res.status(200).send(JSON.stringify(members));
+        res.status(200).send(JSON.stringify({
+          message: 'Members found!',
+          members: members
+        }));
       } else {
-        res.status(404).send(JSON.stringify({ error: 'Members could not be found' }));
+        res.status(404).send(JSON.stringify({
+          error: 'Members could not be found'
+        }));
       }
-    })
+    })  
     .catch(err => console.log(err))
 })
 
 // Request a member
 app.get('/member/:memberId', (req, res) => {
-  const memberId = req.params.memberId;
-  knex('member')
-    .select('*')
-    .where('id', memberId)
-    .then(members => {
-      if (members.length > 0) {
-        const member = members[0];
-        res.status(200).send(JSON.stringify(member));
-      } else {
-        res.status(404).send(JSON.stringify({ error: 'Member not found' }));
-      }
+  const { memberId } = req.params;
+
+  ifMemberExists(memberId)
+    .then(member => {
+      res.status(200).send(JSON.stringify({
+        message: 'Member found!',
+        member: member
+      }));
     })
-    .catch(err => console.log(err))
+    .catch(err => {
+      res.status(404).send(JSON.stringify({
+        error: err
+      }));
+    })
 })
 
 // Request a supervisor's subordinates
 app.get('/member/:memberId/subordinates', (req, res) => {
-  const memberId = req.params.memberId;
+  const { memberId } = req.params;
+
+  ifMemberExists(memberId)
+    .then(member => {
+      knex('member')
+        .select('*')
+        .where('supervisor_id', memberId)
+        .then(subordinates => {
+          if (subordinates.length > 0) {
+            res.status(200).send(JSON.stringify({
+              message: 'Subordinates found!',
+              members: subordinates
+            }));
+          } else {
+            res.status(404).send(JSON.stringify({
+              error: `Could not find subordinates for supervisor of id '${memberId}'.` 
+            }));
+          }
+        })
+        .catch(err => console.log(err))
+    })
+    .catch(err => {
+      res.status(404).send(JSON.stringify({
+        error: err
+      }));
+    })
+});
+
+// Update a member's supervisor
+app.patch('/member/:memberId/supervisor', (req, res) => {
+  const { memberId } = req.params;
+  const { supervisor_id } = req.body;
+
+  ifMemberExists(memberId)
+    .then(member => {
+      ifMemberExists(supervisor_id)
+        .then(supervisor => {
+          knex('member')
+            .where('id', memberId)
+            .update({
+              supervisor_id: supervisor_id
+            }, ['*'])
+            .then(members => {
+              const { password, ...member } = members[0];
+              res.status(200).send(JSON.stringify({
+                message: 'Successfully updated supervisor!',
+                member: member
+              }));
+            })
+        })
+        .catch(err => {
+          res.status(404).send(JSON.stringify({
+            error: `Could not find supervisor with id '${supervisor_id}'`
+          }));
+        })
+    })
+    .catch(err => {
+      res.status(404).send(JSON.stringify({
+        error: err
+      }));
+    })
+})
+
+// Update a member's supervisor
+app.get('/member/:memberId/supervisor', (req, res) => {
+  const { memberId } = req.params;
+
+  ifMemberExists(memberId)
+    .then(member => {
+      const { supervisor_id } = member;
+      ifMemberExists(supervisor_id)
+        .then(supervisor => {
+          res.status(200).send(JSON.stringify({
+            message: 'Successfully updated supervisor!',
+            member: member
+          }));
+        })
+        .catch(err => {
+          res.status(404).send(JSON.stringify({
+            error: `Could not find supervisor with id '${supervisor_id}'`
+          }));
+        })
+    })
+    .catch(err => {
+      res.status(404).send(JSON.stringify({
+        error: err
+      }));
+    })
+})
+
+app.get('/member/:memberId/status', (req, res) => {
+  const { memberId } = req.params;
+
+  ifMemberExists(memberId)
+    .then(member => {
+      const { status_id } = member;
+      knex('status')
+        .join('status_type', 'status.status_type_id', 'status_type.id')
+        .select('status.id', 'status.address', 'status.description', 'status_type.name')
+        .then(statuses => {
+          const status = statuses.find(status => status.id === status_id)
+          
+          if (status) {
+            res.status(200).send({
+              message: 'Status found!',
+              status: status
+            })
+          } else {
+            res.status(404).send({
+              error: `Could not find member of id '${memberId}'s status!`
+            })
+          }
+        })
+    })
+    .catch(err => {
+      res.status(404).send(JSON.stringify({
+        error: err
+      }));
+    })
+})
+
+app.get('/member/:memberId/rank', (req, res) => {
+  const { memberId } = req.params;
+
+  ifMemberExists(memberId)
+    .then(member => {
+      const { rank_id } = member;
+
+      knex('rank')
+        .join('branch', 'rank.branch_id', 'branch.id')
+        .select('rank.id', 'rank.pay_grade', 'rank.title', 'rank.abbreviation', 'branch.name')
+        .then(ranks => {
+          const rank = ranks.find(rank => rank.id === rank_id);
+          const { name, ...modifiedRank } = rank;
+          modifiedRank.branch = rank.name;
+
+          if (rank) {
+            res.status(200).send({
+              message: 'Rank found!',
+              rank: modifiedRank
+            })
+          } else {
+            res.status(404).send({
+              error: `Could not find member of id '${memberId}'s rank!`
+            })
+          }
+        })
+    })
+    .catch(err => {
+      res.status(404).send(JSON.stringify({
+        error: err
+      }));
+    })
+})
+
+// Requests all the supervisors
+app.get('/supervisors', (req, res) => {
   knex('member')
     .select('*')
-    .where('supervisor_id', memberId)
-    .then(subordinates => {
-      if (subordinates.length > 0) {
-        res.status(200).send(JSON.stringify(subordinates));
+    .where('is_supervisor', true)
+    .then(supervisors => {
+      if (supervisors.length > 0) {
+        res.status(200).send(JSON.stringify({
+          message: 'Supervisors found!',
+          members: supervisors
+        }));
       } else {
-        res.status(404).send(JSON.stringify({ error: `Could not find subordinates for supervisor of id '${memberId}'.` }));
+        res.status(404).send(JSON.stringify({
+          error: `Could not find supervisors.` 
+        }));
       }
     })
-    .catch(err => console.log(err))
-});
+})
 
 
 app.listen(port, () => {
-  console.log(`server is listening on port ${port}`);
-});
+    console.log(`server is listening on port ${port}`)
+})
