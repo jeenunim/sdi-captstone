@@ -10,13 +10,13 @@ exports.seed = async function(knex) {
     {
       first_name: 'Bradley', 
       last_name: 'Saltzman', 
+      username: 'bradley.saltzman',
+      password: 'password',
       branch_id: 5,
       rank_id: 20, 
       office_symbol: 'SF/CSO', 
-      org_id: 1, 
-      supervisor_id: 1, 
-      location_id: 1, 
-      status: 'telework', 
+      org_id: 1,
+      status_id: 1, 
       is_supervisor: true, 
       is_commander: true 
     },

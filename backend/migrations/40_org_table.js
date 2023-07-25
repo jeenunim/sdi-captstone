@@ -5,7 +5,8 @@
 exports.up = function(knex) {
   return knex.schema.createTable('org', table => {
     table.increments('id')
-    table.string('name')
+    table.string('name').notNullable();
+    table.integer('commander_id');
   })
 };
 
@@ -14,6 +15,5 @@ exports.up = function(knex) {
  * @returns { Promise<void> }
  */
 exports.down = function(knex) {
-    return knex.schema.dropTableIfExists('org')
-  
+  return knex.schema.dropTableIfExists('org');
 };

@@ -5,10 +5,10 @@
 exports.up = function(knex) {
     return knex.schema.createTable('member', table => {
         table.increments('id');
-        table.string('first_name');
-        table.string('last_name');
-        table.string('username');
-        table.string('password');
+        table.string('first_name').notNullable();
+        table.string('last_name').notNullable();
+        table.string('username').notNullable();
+        table.string('password').notNullable();
         table.integer('branch_id');
         table.foreign('branch_id').references('branch.id')
         table.integer('rank_id');
@@ -17,11 +17,10 @@ exports.up = function(knex) {
         table.integer('org_id');
         table.foreign('org_id').references('org.id');
         table.integer('supervisor_id');
-        table.integer('location_id');
-        table.foreign('location_id').references('location.id');
-        table.string('status');
-        table.boolean('is_supervisor');
-        table.boolean('is_commander')
+        table.integer('status_id');
+        table.foreign('status_id').references('status.id');
+        table.boolean('is_supervisor').notNullable().defaultTo(false);
+        table.boolean('is_commander').notNullable().defaultTo(false);
     })
 };
 
@@ -34,10 +33,9 @@ exports.down = function(knex) {
         table.dropForeign('branch_id')
         table.dropForeign('rank_id');
         table.dropForeign('org_id');
-        table.dropForeign('location_id');
+        table.dropForeign('status_id');
     })
     .then(function() {
         return knex.schema.dropTableIfExists('member');
     })
-  
 };
