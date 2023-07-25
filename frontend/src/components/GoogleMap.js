@@ -13,7 +13,7 @@ export default function GoogleMap() {
 
   useEffect(() => {
     // Fetch your API key from an environment variable or any other method you prefer.
-    const apiKeyFromEnv = 'AIzaSyAA-NZzwF-O1yjVaWx7KG9KfAoG4sJz_64';
+    const apiKeyFromEnv = 'APIKEY';
     setApiKey(apiKeyFromEnv);
     if (apiKeyFromEnv) {
       loadjs(`https://maps.googleapis.com/maps/api/js?key=${apiKeyFromEnv}&libraries=places`, {
