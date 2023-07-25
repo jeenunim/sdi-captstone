@@ -40,14 +40,26 @@ app.post('/sign-up', (req, res) => {
       if (accountFound) {
         res.status(409).send(JSON.stringify({error: 'An account with that username already exists'}));
       } else {
-        const newAccount = req.body;
         guard('username', 'string', req, res);
         guard('password', 'string', req, res);
         guard('first_name', 'string', req, res);
         guard('last_name', 'string', req, res);
+
+        const newAccount = req.body;
+
+        knex('member')
+        .insert(newAccount, ['*'])
+        .then(accounts => {
+          // Removing password from account variable before sending back to client
+          const { password, ...account } = accounts[0];
+          res.status(201).send(JSON.stringify(account));
+        })
       }
     })
-    .catch(err => console.log(err))
+    .catch(err => {
+      console.log(err)
+      res.status(400).send(JSON.stringify({error: err.message}));
+    })
 })
 
 // Request all members
