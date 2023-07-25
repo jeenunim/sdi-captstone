@@ -4,6 +4,7 @@
  */
 exports.seed = async function(knex) {
   // Deletes ALL existing entries
+  await knex.schema.raw('TRUNCATE member CASCADE');
   await knex('member').del()
   await knex('member').insert([
     {

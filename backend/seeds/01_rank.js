@@ -4,6 +4,7 @@
  */
 exports.seed = async function(knex) {
     // Deletes ALL existing entries
+    await knex.schema.raw('TRUNCATE rank CASCADE');
     await knex('rank').del()
     await knex('rank').insert([
         {
