@@ -57,6 +57,7 @@ app.get('/', (req, res) => {
 
 app.post('/login', (req, res) => {
   const { username, password } = req.body;
+
   knex('member')
     .select('*')
     .where('username', username)
@@ -65,6 +66,7 @@ app.post('/login', (req, res) => {
       const memberFound = members.length > 0
       if (memberFound) {
         const member = members[0];
+
         res.status(200).send({
           message: 'Login success', 
           member: member
@@ -80,6 +82,7 @@ app.post('/login', (req, res) => {
 
 app.post('/sign-up', (req, res) => {
   const { username } = req.body;
+
   knex('member')
     .where('username', username)
     .then(members => {
@@ -138,6 +141,7 @@ app.get('/members', (req, res) => {
 // Request a member
 app.get('/member/:memberId', (req, res) => {
   const { memberId } = req.params;
+
   ifMemberExists(memberId)
     .then(member => {
       res.status(200).send(JSON.stringify({
@@ -235,6 +239,71 @@ app.get('/member/:memberId/supervisor', (req, res) => {
           res.status(404).send(JSON.stringify({
             error: `Could not find supervisor with id '${supervisor_id}'`
           }));
+        })
+    })
+    .catch(err => {
+      res.status(404).send(JSON.stringify({
+        error: err
+      }));
+    })
+})
+
+app.get('/member/:memberId/status', (req, res) => {
+  const { memberId } = req.params;
+
+  ifMemberExists(memberId)
+    .then(member => {
+      const { status_id } = member;
+      knex('status')
+        .join('status_type', 'status.status_type_id', 'status_type.id')
+        .select('status.id', 'status.address', 'status.description', 'status_type.name')
+        .then(statuses => {
+          const status = statuses.find(status => status.id === status_id)
+          
+          if (status) {
+            res.status(200).send({
+              message: 'Status found!',
+              status: status
+            })
+          } else {
+            res.status(404).send({
+              error: `Could not find member of id '${memberId}'s status!`
+            })
+          }
+        })
+    })
+    .catch(err => {
+      res.status(404).send(JSON.stringify({
+        error: err
+      }));
+    })
+})
+
+app.get('/member/:memberId/rank', (req, res) => {
+  const { memberId } = req.params;
+
+  ifMemberExists(memberId)
+    .then(member => {
+      const { rank_id } = member;
+
+      knex('rank')
+        .join('branch', 'rank.branch_id', 'branch.id')
+        .select('rank.id', 'rank.pay_grade', 'rank.title', 'rank.abbreviation', 'branch.name')
+        .then(ranks => {
+          const rank = ranks.find(rank => rank.id === rank_id);
+          const { name, ...modifiedRank } = rank;
+          modifiedRank.branch = rank.name;
+
+          if (rank) {
+            res.status(200).send({
+              message: 'Rank found!',
+              rank: modifiedRank
+            })
+          } else {
+            res.status(404).send({
+              error: `Could not find member of id '${memberId}'s rank!`
+            })
+          }
         })
     })
     .catch(err => {
