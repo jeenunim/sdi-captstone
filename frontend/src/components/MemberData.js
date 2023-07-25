@@ -36,5 +36,3 @@ const MemberData = () => {
         </>
     )
 }
-
-export default MemberData

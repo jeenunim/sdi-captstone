@@ -4,15 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "knex migrate:latest && knex seed:run && nodemon app.js",
+    "start-dev": "knex migrate:rollback && knex migrate:latest && knex seed:run && nodemon app.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "cookie-parser": "^1.4.6",
-    "cors": "^2.8.5",
     "express": "^4.18.2",
     "knex": "^2.5.1",
     "nodemon": "^3.0.1",
