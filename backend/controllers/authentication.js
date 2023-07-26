@@ -13,7 +13,7 @@ const login = (username, password) => {
     .then(members => {
       const memberFound = members.length > 0
       if (memberFound) {
-        const member = members[0];
+        const { password, ...member } = members[0];
         return member;
       } else {
         throw new Error('Invalid username/password combination');
@@ -22,6 +22,10 @@ const login = (username, password) => {
     .catch(err => console.log(err))
 }
 
+/**
+ * @param {string} username 
+ * @returns {member}
+ */
 const signUp = (username) => {
   return knex('member')
     .where('username', username)
