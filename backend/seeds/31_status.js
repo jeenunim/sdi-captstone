@@ -10,6 +10,11 @@ exports.seed = async function(knex) {
       status_type_id: 3,
       address: 'Georgia, USA',
       description: 'NSA Georgia'
-    }
+    },
+    {
+      status_type_id: 4,
+      address: 'Hollywood Blvd, Los Angeles, CA',
+      description: 'Local Leave'
+    },
   ]);
 };
