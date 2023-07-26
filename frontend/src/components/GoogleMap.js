@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
 import GoogleMapReact from "google-map-react";
 import MemberData from "./MemberData";
+import dotenv from 'dotenv';
 import loadjs from "loadjs";
 import AppContext from "../AppContext";
 
@@ -14,11 +15,7 @@ export default function GoogleMap() {
 
   const [isLoading, setIsLoading] = useState(true);
 
-  const {
-    membersList,
-    locationsList,
-    mergedList,
-  } = useContext(AppContext);
+  const {renderList} = useContext(AppContext);
 
   useEffect(() => {
     // Fetch your API key from an environment variable or any other method you prefer.
@@ -63,7 +60,7 @@ export default function GoogleMap() {
           // If marker exists, update its position
           markers.current[markerIndex].marker.setPosition(updatedCenter);
         } else {
-          const image = `/${member.status}Marker.png`;
+          const image = `/leaveMarker.png`;
           const name = `${member.first_name} ${member.last_name}`
           // If marker doesn't exist, create a new marker
           const newMarker = new window.google.maps.Marker({
@@ -87,18 +84,20 @@ export default function GoogleMap() {
     return <div>Error loading Google Maps. Please try again later.</div>;
   }
 
-
+console.log(renderList)
   const generateMarkers = () => {
-    mergedList.forEach(member => {
+    renderList.forEach(member => {
       console.log(member)
-      const location = member.location
+      const location = member.address
+      console.log('member location:', location)
       codeAddress(location, member);
     })
   }
-
+  
+if (renderList) {
   return (
     <main>
-      <div style={{ height: "40vh", width: "100%" }}>
+      <div style={{position: 'relative', left: '5%', height: "40vh", width: "90%" }}>
         {isLoaded && apiKey && (
           <GoogleMapReact
             bootstrapURLKeys={{ key: apiKey }}
@@ -114,7 +113,7 @@ export default function GoogleMap() {
           />
         )}
       </div>
-      <MemberData />
     </main>
   );
+}
 }

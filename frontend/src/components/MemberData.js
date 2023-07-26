@@ -1,51 +1,39 @@
-import React, { useState, useEffect, useRef, useContext } from "react";
-import { Link } from 'react-router-dom'
-import { Table, button } from 'react-bootstrap';
+import React, { useContext } from "react";
+import { Table } from 'react-bootstrap';
 import AppContext from "../AppContext";
 
 const MemberData = () => {
+  const { renderList } = useContext(AppContext);
 
-    const {
-        membersList
-      } = useContext(AppContext);
-      console.log(membersList)
+  // Check if renderList is empty or undefined
+  if (!renderList || renderList.length === 0) {
+    return <div>No member data available.</div>;
+  }
 
-  useEffect(() => {
-    fetch("http://localhost:8080/locations")
-      .then((res) => res.json())
-      .then((data) => {
-        setLocationsList(data);
-      })
-      .catch((error) => {
-        console.error("Error fetching locations data:", error);
-      });
-  }, []);
-    return (
-        <>
-        <div>
-            <Table striped bordered hover>
-                <thead>
-                  <tr>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                    {/* <th>Member Status</th>
-                    <th>Member Location</th> */}
-                  </tr>
-                </thead>
-                <tbody>
-                  {membersList.map((item) => (
-                    <tr key={item.id}>
-                      <td>{item.first_name}</td>
-                      <td>{item.last_name}</td>
-                      {/* <td>{item.status}</td>
-                      <td>{item.location}</td> */}
-                    </tr>
-                  ))}
-                </tbody>
-            </Table>
-        </div>
-        </>
-    )
-}
+  return (
+    <div>
+      <Table striped bordered hover>
+        <thead>
+          <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Member Status</th>
+            <th>Member Address</th>
+          </tr>
+        </thead>
+        <tbody>
+          {renderList.map((item) => (
+            <tr key={item.id}>
+              <td>{item.first_name}</td>
+              <td>{item.last_name}</td>
+              <td>{item.status_id}</td>
+              <td>{item.address}</td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
+    </div>
+  );
+};
 
-export default MemberData
+export default MemberData;
