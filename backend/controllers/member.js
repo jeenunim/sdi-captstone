@@ -11,7 +11,7 @@ const getMember = (memberId) => {
     .then(members => {
       const memberFound = members.length > 0;
       if (memberFound) {
-        const member = members[0];
+        const { password, ...member } = members[0];
         return member
       } else {
         throw new Error(`Could not find member of id '${memberId}'`);
