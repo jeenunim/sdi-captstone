@@ -4,11 +4,19 @@ import App from './App';
 // const request = require('supertest');
 import AppContext from './AppContext';
 
-const {membersList} = useContext(AppContext);
+
 
 describe('App', () => {
-  render(<App />)
-  it('Holds member object from backend', () => {
+  const {membersList} = useContext(AppContext);
+  
+  render(
+  <AppContextProvider>
+  <App />
+  </AppContextProvider>
+  )
+
+  it('Holds member object from backend', async () => {
+    
     expect(membersList)
     .toEqual(expect.objectContaining({ 
       id: expect.any(Number),

@@ -25,7 +25,9 @@
     "react-scripts": "5.0.1",
     "stream-browserify": "^3.0.0",
     "supertest": "^6.3.3",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "eslint-config-next": "^13.4.10",
+    "next": "^13.0.5"
   },
   "scripts": {
     "start": "react-app-rewired start",

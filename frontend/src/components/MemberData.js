@@ -26,7 +26,7 @@ const MemberData = () => {
             <tr key={item.id}>
               <td>{item.first_name}</td>
               <td>{item.last_name}</td>
-              <td>{item.status_id}</td>
+              <td>{item.status}</td>
               <td>{item.address}</td>
             </tr>
           ))}
