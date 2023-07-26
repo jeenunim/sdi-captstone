@@ -7,8 +7,11 @@ exports.seed = async function(knex) {
   await knex('org').del()
   await knex('org').insert([
     {
-      name: 'Office of the Chief of Spacae Operations (OCSO)',
+      name: 'Office of the Chief of Space Operations (OCSO)',
       commander_id: 1
+    },
+    {
+      name: 'Space Systems Command'
     }
   ])
 };

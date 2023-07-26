@@ -51,26 +51,6 @@ const getMemberSubordinates = (memberId) => {
     })
 }
 
-// /**
-//  * @param {*} memberId 
-//  * @param {*} supervisorId 
-//  * @returns 
-//  */
-// const updateMemberSupervisor = (memberId, supervisorId) => {
-//     return knex('member')
-//       .where('id', memberId)
-//       .update({supervisor_id: supervisorId }, ['*']);
-//       .then((updateMembers) => {
-//         if (!updateMember || updateMember.length === 0) {
-//           throw new Error(`not able to update supervisor '${memberId}'`)
-//         return updateMembers[0];
-//         } catch (error) {
-//           console.error(error);
-//           throw new Error('failed to update member supervisor database.')
-//         });
-//       }; 
-
-// below is a refactor of the code above 
 /** 
 * @param {number} numberId
 * @param {number} supervisorId
@@ -91,7 +71,6 @@ const updateMemberSupervisor = (memberId, supervisorId) => {
     throw new Error('Failed to update member supervisor in the database.')
   })
 }
-// end of refactor
 
 /**
  * @param {number} memberId Expects member.id

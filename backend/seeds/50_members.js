@@ -14,11 +14,22 @@ exports.seed = async function(knex) {
       password: 'password',
       branch_id: 5,
       rank_id: 20, 
-      office_symbol: 'SF/CSO', 
+      office_symbol: 'SF/OCSO', 
       org_id: 1,
       status_id: 1, 
       is_supervisor: true, 
       is_commander: true 
     },
+    {
+      first_name: 'John',
+      last_name: 'Doe',
+      username: 'john.doe',
+      password: 'password',
+      branch_id: 5,
+      rank_id: 5,
+      office_symbol: 'USSF/SSC/S2',
+      org_id: 2,
+      status_id: 2
+    }
   ]);
 };

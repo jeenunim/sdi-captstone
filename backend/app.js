@@ -6,6 +6,7 @@ const cookieParser = require('cookie-parser'); // the import of cookies
 const cors = require('cors');
 const { getMember, getMemberSubordinates, getMemberSupervisor, getMemberStatus, getMemberRank } = require('./controllers/member.js');
 const { getMembers, getMembersStatus, getMembersSupervisor } = require('./controllers/members.js');
+const { getStatusTypes, getMembersOfStatusType } = require('./controllers/status.js');
 
 app.use(cors());
 app.use(express.json());
@@ -158,6 +159,24 @@ app.get('/members/statuses', (req, res) => {
     })
 })
 
+app.get('/members/status_type/:statusType', (req, res) => {
+  /** @type {string} */
+  const statusType = req.params.statusType;
+
+  getMembersOfStatusType(statusType)
+    .then(members => {
+      res.status(200).send(JSON.stringify({
+        message: `Found members of status type, '${statusType}'`,
+        members: members
+      }));
+    })
+    .catch(err => {
+      res.status(404).send(JSON.stringify({
+        error: err.message 
+      }));
+    })
+})
+
 // Requests supervisors of all members
 app.get('/members/supervisors', (req, res) => {
   getMembersSupervisor()
@@ -291,15 +310,30 @@ app.get('/member/:memberId/rank', (req, res) => {
 
   getMemberRank(memberId)
     .then(rank => {
-      res.status(200).send({
+      res.status(200).send(JSON.stringify({
         message: 'Rank found!',
         rank: rank
-      })
+      }))
     })
     .catch(err => {
-      res.status(404).send({
+      res.status(404).send(JSON.stringify({
         error: `Could not find member of id '${memberId}'s rank!`
-      })
+      }))
+    })
+})
+
+app.get('/status_types', (req, res) => {
+  getStatusTypes()
+    .then(statusTypes => {
+      res.status(200).send(JSON.stringify({
+        message: 'Status types found!',
+        status_types: statusTypes
+      }))
+    })
+    .catch(err => {
+      res.status(404).send(JSON.stringify({
+        error: `Could not find status types!`
+      }))
     })
 })
 
