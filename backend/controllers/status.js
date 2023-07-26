@@ -13,12 +13,12 @@ const getStatusTypes = () => {
       if (statusTypesFound) {
         return statusTypes;
       } else {
-        return new Error('No status types found!');
+        throw new Error('No status types found!');
       }
     })
     .catch(err => {
       console.error(err.message);
-      return err;
+      throw err;
     })
 }
 
@@ -37,30 +37,13 @@ const getMembersOfStatusType = (statusType) => {
             .map(status => getMember(status.member_id))
         );
       } else {
-        return new Error(`Could not find any statuses...`)
+        throw new Error(`Could not find any statuses...`)
       }
     })
     .catch(err => {
       console.error(err.message);
-      return err;
+      throw err;
     })
-  // return getMembers()
-  //   .then(members => {
-  //     const membersFound = members.length > 0;
-  //     if (membersFound) {
-  //       return Promise.all(
-  //         members
-  //           .map(member => {
-  //             return getMemberStatus(member.id)
-  //               .then(status => (status.type.toLowerCase() === statusType.toLocaleLowerCase()) ? member : undefined)
-  //               .catch(err => {
-  //                 console.error(err.message)
-  //               })
-  //           })
-  //           .filter(member => member !== undefined)
-  //       )
-  //     }
-  //   })
 }
 
 module.exports = { getStatusTypes, getMembersOfStatusType };
