@@ -15,7 +15,7 @@ function App() {
     fetch("http://localhost:8080/members")
       .then((res) => res.json())
       .then((data) => {
-        setMembersList(data);
+        setMembersList(data.members);
       })
       .catch((error) => {
         console.error("Error fetching members data:", error);

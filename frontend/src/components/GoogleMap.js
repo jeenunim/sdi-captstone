@@ -14,7 +14,6 @@ export default function GoogleMap() {
 
   const [isLoading, setIsLoading] = useState(true);
 
-
   const {
     membersList,
     locationsList,
