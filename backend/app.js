@@ -2,6 +2,13 @@ const express = require('express');
 const app = express();
 const port = 8080;
 const knex = require('knex')(require('./knexfile.js')['development']);
+const cookieParser = require('cookie-parser'); // the import of cookies
+const cors = require('cors');
+const { getMembers } = require('./controllers/member.js');
+
+app.use(cors());
+app.use(express.json());
+app.use(cookieParser());
 
 /**
  * @param {string} key - Expected key in req.body
@@ -30,7 +37,7 @@ const guard = (key, type, req, res) => {
  * @returns {Promise<member>}
  */
 const ifMemberExists = (memberId) => {
-  const promise = knex('member')
+  return knex('member')
     .select('*')
     .where('id', memberId)
     .then(members => {
@@ -44,10 +51,7 @@ const ifMemberExists = (memberId) => {
         return Promise.reject(new Error(`Could not find member of id '${memberId}'`))
       }
     })
-  return promise;
 }
-
-app.use(express.json());
 
 app.get('/', (req, res) => {
   res.status(200).send(JSON.stringify({
@@ -66,6 +70,8 @@ app.post('/login', (req, res) => {
       const memberFound = members.length > 0
       if (memberFound) {
         const member = members[0];
+
+        res.cookie('memberId', member.id, {httpOnly: true });
 
         res.status(200).send({
           message: 'Login success', 
@@ -121,21 +127,18 @@ app.post('/sign-up', (req, res) => {
 
 // Request all members
 app.get('/members', (req, res) => {
-  knex('member')
-    .select('*')
+  getMembers()
     .then(members => {
-      if (members.length > 0) {
-        res.status(200).send(JSON.stringify({
-          message: 'Members found!',
-          members: members
-        }));
-      } else {
-        res.status(404).send(JSON.stringify({
-          error: 'Members could not be found'
-        }));
-      }
-    })  
-    .catch(err => console.log(err))
+      res.status(200).send(JSON.stringify({
+        message: 'Members found!',
+        members: members
+      }));
+    })
+    .catch(err => {
+      res.status(404).send(JSON.stringify({
+        error: 'Members could not be found!'
+      }));
+    })
 })
 
 // Request a member
