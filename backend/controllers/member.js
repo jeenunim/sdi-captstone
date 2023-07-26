@@ -14,12 +14,12 @@ const getMember = (memberId) => {
         const member = members[0];
         return member
       } else {
-        return new Error(`Could not find member of id '${memberId}'`);
+        throw new Error(`Could not find member of id '${memberId}'`);
       }
     })
     .catch(err => {
       console.error(err.message);
-      return err;
+      throw err;
     })
 }
 
@@ -37,17 +37,17 @@ const getMemberSubordinates = (memberId) => {
           if (subordinates.length > 0) {
             return subordinates
           } else {
-            return new Error(`Could not find subordinates for supervisor of id '${memberId}'.`)
+            throw new Error(`Could not find subordinates for supervisor of id '${memberId}'.`)
           }
         })
         .catch(err => {
           console.error(err.message)
-          return err;
+          throw err;
         })
     })
     .catch(err => {
       console.error(err.message)
-      return err;
+      throw err;
     })
 }
 
@@ -85,7 +85,7 @@ const getMemberSupervisor = (memberId) => {
     })
     .catch(err => {
       console.error(err.message);
-      return err
+      throw err
     })
 }
 
@@ -114,12 +114,12 @@ const getMemberStatus = (memberId) => {
         })
         .catch(err => {
           console.error(err.message);
-          return err;
+          throw err;
         })
     })
     .catch(err => {
       console.error(err.message);
-      return err;
+      throw err;
     })
 }
 
@@ -140,17 +140,17 @@ const getMemberRank = (memberId) => {
             rank.branch = name;
             return rank;
           } else {
-            return new Error(`Could not find member of id '${memberId}'s rank!`);
+            throw new Error(`Could not find member of id '${memberId}'s rank!`);
           }
         })
         .catch(err => {
           console.error(err.message);
-          return err;
+          throw err;
         })
       })
       .catch(err => {
         console.error(err.message);
-        return err;
+        throw err;
       })
 }
 

@@ -11,12 +11,12 @@ const getMembers = () => {
       if (members.length > 0) {
        return members
       } else {
-        return new Error('Members could not be found!')
+        throw new Error('Members could not be found!')
       }
     })  
     .catch(err => {
       console.error(err.message);
-      return err;
+      throw err;
     });
 };
 
@@ -31,7 +31,7 @@ const getMembersStatus = () => {
     })
     .catch(err => {
       console.error(err.message)
-      return err;
+      throw err;
     })
 }
 
@@ -43,12 +43,12 @@ const getMembersSupervisor = () => {
       if (supervisorsFound) {
         return supervisors;
       } else {
-        return new Error('No supervisors found...');
+        throw new Error('No supervisors found...');
       }
     })
     .catch(err => {
       console.error(err.message)
-      return err;
+      throw err;
     })
 }
 
