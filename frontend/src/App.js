@@ -9,6 +9,7 @@ import "./App.css";
 function App() {
   const [membersList, setMembersList] = useState([]);
   const [statusList, setStatusList] = useState([]);
+  const [statusTypeList, setStatusTypeList] = useState([]);
   const [renderList, setRenderList] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -24,6 +25,10 @@ function App() {
         const statusesData = await statusesResponse.json();
         setStatusList(statusesData.statuses);
 
+        const statusTypeResponse = await fetch("http://localhost:8080/status_types");
+        const statusTypeData = await statusTypeResponse.json();
+        setStatusTypeList(statusTypeData.status_types);
+
         setIsLoading(false);
       } catch (error) {
         setError("Error fetching data. Please try again later.");
@@ -37,11 +42,13 @@ function App() {
   useEffect(() => {
     if (membersList.length > 0 && statusList.length > 0) {
       const mergedData = membersList.map((member) => {
-        const status = statusList.find((stat) => stat.id === member.status_id);
+      const status = statusList.find((stat) => stat.id === member.status_id);
+      // const statusType = statusTypeList.find((statType) => statType.member_id === member.id)
         if (status) {
           return {
             ...member,
             address: status.address,
+            status: status.type
           };
         } else {
           return member;
@@ -49,7 +56,8 @@ function App() {
       });
       setRenderList(mergedData);
     }
-  }, [membersList, statusList]);
+  }, [membersList, statusList, statusTypeList]);
+  console.log(statusTypeList.map(e => e))
 
   const provided = {
     membersList,
