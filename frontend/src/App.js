@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import Overview from "./components/Overview";
 import GoogleMap from "./components/GoogleMap";
 import Header from "./components/Header";
 import AppContext from "./AppContext";
@@ -7,68 +8,77 @@ import "./App.css";
 
 function App() {
   const [membersList, setMembersList] = useState([]);
-  const [locationsList, setLocationsList] = useState([]);
-  const [mergedList, setMergedList] = useState([]);
+  const [statusList, setStatusList] = useState([]);
+  const [renderList, setRenderList] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Fetch members data
-    fetch("http://localhost:8080/members")
-      .then((res) => res.json())
-      .then((data) => {
-        setMembersList(data.members);
-      })
-      .catch((error) => {
-        console.error("Error fetching members data:", error);
-      });
-    console.log('Members List: ', membersList)
-    // Fetch locations data
-    fetch("http://localhost:8080/locations")
-      .then((res) => res.json())
-      .then((data) => {
-        setLocationsList(data);
-      })
-      .catch((error) => {
-        console.error("Error fetching locations data:", error);
-      });
+    const fetchData = async () => {
+      try {
+        const membersResponse = await fetch("http://localhost:8080/members");
+        const membersData = await membersResponse.json();
+        setMembersList(membersData.members);
+
+        const statusesResponse = await fetch("http://localhost:8080/members/statuses");
+        const statusesData = await statusesResponse.json();
+        setStatusList(statusesData.statuses);
+
+        setIsLoading(false);
+      } catch (error) {
+        setError("Error fetching data. Please try again later.");
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
   }, []);
 
-  
-
   useEffect(() => {
-      const mergedData = [];
-    
-      membersList.forEach(member => {
-        const { first_name, last_name, location_id, status } = member;
-        const location = locationsList.find(loc => loc.id === location_id);
-    
-        if (location) {
-          const mergedMember = { first_name, last_name, location_id, status, location: location.location };
-          mergedData.push(mergedMember);
+    if (membersList.length > 0 && statusList.length > 0) {
+      const mergedData = membersList.map((member) => {
+        const status = statusList.find((stat) => stat.id === member.status_id);
+        if (status) {
+          return {
+            ...member,
+            address: status.address,
+          };
+        } else {
+          return member;
         }
       });
-  
-    setMergedList(mergedData);
-  }, [membersList, locationsList]);
-  
+      setRenderList(mergedData);
+    }
+  }, [membersList, statusList]);
 
   const provided = {
     membersList,
     setMembersList,
-    locationsList,
-    setLocationsList,
-    mergedList,
+    statusList,
+    setStatusList,
+    renderList,
+    setRenderList
   };
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>{error}</div>;
+  }
 
   return (
     <AppContext.Provider value={provided}>
       <Router>
         <Header />
         <Routes>
-          <Route path="/maps" element={<GoogleMap />} />
+          <Route path="/maps" element={<Overview />} />
         </Routes>
       </Router>
     </AppContext.Provider>
   );
 }
+
 
 export default App;
