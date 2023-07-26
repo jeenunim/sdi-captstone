@@ -4,7 +4,8 @@ const port = 8080;
 const knex = require('knex')(require('./knexfile.js')['development']);
 const cookieParser = require('cookie-parser'); // the import of cookies
 const cors = require('cors');
-const { getMembers } = require('./controllers/member.js');
+const { getMember, getMemberSubordinates, getMemberSupervisor, getMemberStatus, getMemberRank } = require('./controllers/member.js');
+const { getMembers, getMembersStatus, getMembersSupervisor } = require('./controllers/members.js');
 
 app.use(cors());
 app.use(express.json());
@@ -71,16 +72,16 @@ app.post('/login', (req, res) => {
       if (memberFound) {
         const member = members[0];
 
-        res.cookie('memberId', member.id, {httpOnly: true });
+        res.cookie('memberId', member.id, {httpOnly: true }); //prevent XSS
 
-        res.status(200).send({
+        res.status(200).send(JSON.stringify({
           message: 'Login success', 
           member: member
-        })
+        }))
       } else {
-        res.status(401).send({
+        res.status(401).send(JSON.stringify({
           message: 'Invalid username/password'
-        })
+        }))
       }
     })
     .catch(err => console.log(err))
@@ -120,7 +121,7 @@ app.post('/sign-up', (req, res) => {
     .catch(err => {
       console.log(err)
       res.status(400).send(JSON.stringify({
-        error: err.message
+        error: err
       }));
     })
 })
@@ -136,16 +137,49 @@ app.get('/members', (req, res) => {
     })
     .catch(err => {
       res.status(404).send(JSON.stringify({
-        error: 'Members could not be found!'
+        error: err.message
+      }));
+    })
+})
+
+// Request status of all members
+app.get('/members/statuses', (req, res) => {
+  getMembersStatus()
+    .then(statuses => {
+      res.status(200).send(JSON.stringify({
+        message: `Found all members' status!`,
+        statuses: statuses
+      }));
+    })
+    .catch(err => {
+      res.status(404).send(JSON.stringify({
+        error: `Could not return  all members' status...`
+      }));
+    })
+})
+
+// Requests supervisors of all members
+app.get('/members/supervisors', (req, res) => {
+  getMembersSupervisor()
+    .then(supervisors => {
+      res.status(200).send(JSON.stringify({
+        message: 'Supervisors found!',
+        supervisors: supervisors
+      }));
+    })
+    .catch(err => {
+      res.status(404).send(JSON.stringify({
+        error: err.message 
       }));
     })
 })
 
 // Request a member
 app.get('/member/:memberId', (req, res) => {
-  const { memberId } = req.params;
+  /** @type {number} */
+  const memberId = req.params.memberId;
 
-  ifMemberExists(memberId)
+  getMember(memberId)
     .then(member => {
       res.status(200).send(JSON.stringify({
         message: 'Member found!',
@@ -154,37 +188,26 @@ app.get('/member/:memberId', (req, res) => {
     })
     .catch(err => {
       res.status(404).send(JSON.stringify({
-        error: err
+        error: err.message
       }));
     })
 })
 
 // Request a supervisor's subordinates
 app.get('/member/:memberId/subordinates', (req, res) => {
-  const { memberId } = req.params;
+  /** @type {number} */
+  const memberId = req.params.memberId;
 
-  ifMemberExists(memberId)
-    .then(member => {
-      knex('member')
-        .select('*')
-        .where('supervisor_id', memberId)
-        .then(subordinates => {
-          if (subordinates.length > 0) {
-            res.status(200).send(JSON.stringify({
-              message: 'Subordinates found!',
-              members: subordinates
-            }));
-          } else {
-            res.status(404).send(JSON.stringify({
-              error: `Could not find subordinates for supervisor of id '${memberId}'.` 
-            }));
-          }
-        })
-        .catch(err => console.log(err))
+  getMemberSubordinates(memberId)
+    .then(subordinates => {
+      res.status(200).send(JSON.stringify({
+        message: 'Subordinates found!',
+        subordinates: subordinates
+      }));
     })
     .catch(err => {
       res.status(404).send(JSON.stringify({
-        error: err
+        error: err.message
       }));
     })
 });
@@ -224,117 +247,61 @@ app.patch('/member/:memberId/supervisor', (req, res) => {
     })
 })
 
-// Update a member's supervisor
+// Get a member's supervisor
 app.get('/member/:memberId/supervisor', (req, res) => {
-  const { memberId } = req.params;
+  /** @type {number} */
+  const memberId = req.params.memberId;
 
-  ifMemberExists(memberId)
-    .then(member => {
-      const { supervisor_id } = member;
-      ifMemberExists(supervisor_id)
-        .then(supervisor => {
-          res.status(200).send(JSON.stringify({
-            message: 'Successfully updated supervisor!',
-            member: member
-          }));
-        })
-        .catch(err => {
-          res.status(404).send(JSON.stringify({
-            error: `Could not find supervisor with id '${supervisor_id}'`
-          }));
-        })
-    })
-    .catch(err => {
-      res.status(404).send(JSON.stringify({
-        error: err
-      }));
-    })
+  getMemberSupervisor(memberId)
+  .then(supervisor => {
+    res.status(200).send(JSON.stringify({
+      message: 'Successfully retrieved supervisor!',
+      supervisor: supervisor
+    }));
+  })
+  .catch(err => {
+    res.status(404).send(JSON.stringify({
+      error: `Could not find member id '${memberId}'s supervisor`
+    }));
+  })
 })
 
+// Get member's status
 app.get('/member/:memberId/status', (req, res) => {
-  const { memberId } = req.params;
+  /** @type {number} */
+  const memberId = req.params.memberId;
 
-  ifMemberExists(memberId)
-    .then(member => {
-      const { status_id } = member;
-      knex('status')
-        .join('status_type', 'status.status_type_id', 'status_type.id')
-        .select('status.id', 'status.address', 'status.description', 'status_type.name')
-        .then(statuses => {
-          const status = statuses.find(status => status.id === status_id)
-          
-          if (status) {
-            res.status(200).send({
-              message: 'Status found!',
-              status: status
-            })
-          } else {
-            res.status(404).send({
-              error: `Could not find member of id '${memberId}'s status!`
-            })
-          }
-        })
-    })
-    .catch(err => {
-      res.status(404).send(JSON.stringify({
-        error: err
-      }));
-    })
+  getMemberStatus(memberId)
+  .then(status => {
+    res.status(200).send(JSON.stringify({
+      message: 'Status found!',
+      status: status
+    }))
+  })
+  .catch(err => {
+    res.status(404).send(JSON.stringify({
+      error: err.message
+    }))
+  })
 })
 
 app.get('/member/:memberId/rank', (req, res) => {
-  const { memberId } = req.params;
+  /** @type {number} */
+  const memberId = req.params.memberId;
 
-  ifMemberExists(memberId)
-    .then(member => {
-      const { rank_id } = member;
-
-      knex('rank')
-        .join('branch', 'rank.branch_id', 'branch.id')
-        .select('rank.id', 'rank.pay_grade', 'rank.title', 'rank.abbreviation', 'branch.name')
-        .then(ranks => {
-          const rank = ranks.find(rank => rank.id === rank_id);
-          const { name, ...modifiedRank } = rank;
-          modifiedRank.branch = rank.name;
-
-          if (rank) {
-            res.status(200).send({
-              message: 'Rank found!',
-              rank: modifiedRank
-            })
-          } else {
-            res.status(404).send({
-              error: `Could not find member of id '${memberId}'s rank!`
-            })
-          }
-        })
+  getMemberRank(memberId)
+    .then(rank => {
+      res.status(200).send({
+        message: 'Rank found!',
+        rank: rank
+      })
     })
     .catch(err => {
-      res.status(404).send(JSON.stringify({
-        error: err
-      }));
+      res.status(404).send({
+        error: `Could not find member of id '${memberId}'s rank!`
+      })
     })
 })
-
-// Requests all the supervisors
-app.get('/supervisors', (req, res) => {
-  knex('member')
-    .select('*')
-    .where('is_supervisor', true)
-    .then(supervisors => {
-      if (supervisors.length > 0) {
-        res.status(200).send(JSON.stringify({
-          message: 'Supervisors found!',
-          members: supervisors
-        }));
-      } else {
-        res.status(404).send(JSON.stringify({
-          error: `Could not find supervisors.` 
-        }));
-      }
-    })
-})
-
 
 app.listen(port, () => {
     console.log(`server is listening on port ${port}`)
