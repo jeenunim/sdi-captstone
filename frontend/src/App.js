@@ -6,6 +6,7 @@ import Header from "./components/Header";
 import AppContext from "./AppContext";
 import Login from "./components/Login";
 import Register from "./components/Register";
+import Profile from "./components/Profile";
 import "./App.css";
 
 function App() {
@@ -86,6 +87,7 @@ function App() {
           <Route path="/" element={<Login />} />
           <Route path="/signup" element={<Register />} />
           <Route path="/maps" element={<Overview />} />
+          <Route path="/profile" element={<Profile />} />
         </Routes>
       </Router>
     </AppContext.Provider>

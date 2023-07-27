@@ -1,23 +1,31 @@
 import { render, screen } from '@testing-library/react';
 import React, { useContext } from "react";
 import App from './App';
-// const request = require('supertest');
 import AppContext from './AppContext';
-
+// const request = require('supertest');
 
 
 describe('App', () => {
   
-  const membersList = useContext(AppContext);
+  const provided = {
+    membersList,
+    setMembersList,
+    statusList,
+    setStatusList,
+    renderList,
+    setRenderList
+  } = useContext(AppContext);
 
   render(
+  <AppContext.Provider value={membersList}>
   <App />
+  </AppContext.Provider>
   )
 
   it('Holds member object from backend', async () => {
     
     expect(membersList)
-    .toEqual(expect.objectContaining({ 
+    .toEqual(expect.objectContaining({
       id: expect.any(Number),
       first_name: expect.any(String), 
       last_name: expect.any(String),
