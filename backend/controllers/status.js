@@ -46,4 +46,36 @@ const getMembersOfStatusType = (statusType) => {
     })
 }
 
-module.exports = { getStatusTypes, getMembersOfStatusType };
+// /**
+//  * @param {number} memberId 
+//  */
+// const updateMemberStatus = (memberId) => {
+//  // ToDo
+// }
+
+//change or remove if needed 
+/**
+ * @param {number} memberId 
+ * @param {number} statusTypeId 
+ * @returns {Promise<member>}
+ */
+const updateMemberStatus = (memberId, statusTypeId) => {
+  return knex('member')
+    .where('id', memberId)
+    .update({ status_type_id: statusTypeId }, ['*'])
+    .then((updatedMembers) => {
+      const updatedMember = updatedMembers[0];
+      if (!updatedMember) {
+        throw new Error(`Failed to update status for member ${memberId}`);
+      }
+      return updatedMember;
+    })
+    .catch((error) => {
+      console.error(error);
+      throw new Error('Failed to update member status in the database.');
+    });
+}
+
+module.exports = { getStatusTypes, getMembersOfStatusType, updateMemberStatus };
+
+

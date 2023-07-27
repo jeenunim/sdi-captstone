@@ -4,7 +4,7 @@ const port = 8080;
 const knex = require('knex')(require('./knexfile.js')['development']);
 const cookieParser = require('cookie-parser'); // the import of cookies
 const cors = require('cors');
-const { getMember, getMemberSubordinates, getMemberSupervisor, getMemberStatus, getMemberRank } = require('./controllers/member.js');
+const { getMember, getMemberSubordinates, getMemberSupervisor, updateMemberSupervisor, getMemberStatus, getMemberRank, updateMemberProfile } = require('./controllers/member.js');
 const { getMembers, getMembersStatus, getMembersSupervisor } = require('./controllers/members.js');
 const { getStatusTypes, getMembersOfStatusType } = require('./controllers/status.js');
 const { login, signUp } = require('./controllers/authentication.js');
@@ -177,35 +177,21 @@ app.get('/member/:memberId/subordinates', (req, res) => {
 
 // Update a member's supervisor
 app.patch('/member/:memberId/supervisor', (req, res) => {
-  const { memberId } = req.params;
-  const { supervisor_id } = req.body;
+  /** @type {number} */
+  const memberId = req.params.memberId;
+  /** @type {number} */
+  const supervisorId = req.body.supervisor_id;
 
-  ifMemberExists(memberId)
+  updateMemberSupervisor(memberId, supervisorId)
     .then(member => {
-      ifMemberExists(supervisor_id)
-        .then(supervisor => {
-          knex('member')
-            .where('id', memberId)
-            .update({
-              supervisor_id: supervisor_id
-            }, ['*'])
-            .then(members => {
-              const { password, ...member } = members[0];
-              res.status(200).send(JSON.stringify({
-                message: 'Successfully updated supervisor!',
-                member: member
-              }));
-            })
-        })
-        .catch(err => {
-          res.status(404).send(JSON.stringify({
-            error: `Could not find supervisor with id '${supervisor_id}'`
-          }));
-        })
+      res.status(200).send(JSON.stringify({
+        message: 'Successfully updated supervisor!',
+        member: member
+      }));
     })
     .catch(err => {
-      res.status(404).send(JSON.stringify({
-        error: err
+      res.status(400).send(JSON.stringify({
+        error: err.message
       }));
     })
 })
@@ -227,6 +213,26 @@ app.get('/member/:memberId/supervisor', (req, res) => {
       error: `Could not find member id '${memberId}'s supervisor`
     }));
   })
+})
+
+app.patch('/member/:memberId/profile', (req, res) => {
+  /** @type {number} */
+  const memberId = req.params.memberId;
+  /** @type {{first_name: string, last_name: string, password: string, branch_id: number, rank_id: number, office_symbol: string, org_id: number, supervisor_id: number, is_commander: boolean}}*/
+  const profile = req.body;
+
+  updateMemberProfile(memberId, profile)
+    .then(member => {
+      res.status(200).send(JSON.stringify({
+        message: 'Successfully updated profile!',
+        member: member
+      }));
+    })
+    .catch(err => {
+      res.status(400).send(JSON.stringify({
+        error: err.message
+      }));
+    })
 })
 
 // Get member's status
