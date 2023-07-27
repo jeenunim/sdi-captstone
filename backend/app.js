@@ -4,9 +4,9 @@ const port = 8080;
 const knex = require('knex')(require('./knexfile.js')['development']);
 const cookieParser = require('cookie-parser'); // the import of cookies
 const cors = require('cors');
-const { getMember, getMemberSubordinates, getMemberSupervisor, updateMemberSupervisor, getMemberStatus, getMemberRank, updateMemberProfile } = require('./controllers/member.js');
+const { getMember, getMemberSubordinates, getMemberSupervisor, updateMemberSupervisor, getMemberRank, updateMemberProfile } = require('./controllers/member.js');
 const { getMembers, getMembersStatus, getMembersSupervisor } = require('./controllers/members.js');
-const { getStatusTypes, getMembersOfStatusType } = require('./controllers/status.js');
+const { getMemberStatus, getStatusTypes, getMembersOfStatusType, updateMemberStatus } = require('./controllers/status.js');
 const { login, signUp } = require('./controllers/authentication.js');
 
 const corsOptions = {
@@ -253,6 +253,29 @@ app.get('/member/:memberId/status', (req, res) => {
     }))
   })
 })
+
+// Update member's status
+app.patch('/member/:memberId/status', (req, res) => {
+  /** @type {number} */
+  const memberId = req.params.memberId;
+  /** @type {{status_type_id:number, address:string, description:string}} */
+  const status = req.body;
+
+  updateMemberStatus(memberId, status)
+  .then(status => {
+    res.status(200).send(JSON.stringify({
+      message: 'Status updated!',
+      status: status
+    }))
+  })
+  .catch(err => {
+    res.status(404).send(JSON.stringify({
+      error: err.message
+    }))
+  })
+})
+
+
 
 app.get('/member/:memberId/rank', (req, res) => {
   /** @type {number} */
