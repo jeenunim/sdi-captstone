@@ -100,11 +100,12 @@ const getMemberStatus = (memberId) => {
         .join('status_type', 'status.status_type_id', 'status_type.id')
         .select('status.id', 'status.address', 'status.description', 'status_type.name')
         .then(statuses => {
-          const statusFound = statuses.length > 0;
-          if (statusFound) {
+          const statusesFound = statuses.length > 0;
+          if (statusesFound) {
             const statusId = member.status_id;
-            const { name, ...status } = statuses.find(status => status.id === statusId);
-            if (status) {
+            const statusFound = statuses.find(status => status.id === statusId);
+            if (statusFound) {
+              const { name, ...status } = statusFound;
               status.type = name;
               status.member_id = memberId;
               return status;
