@@ -3,6 +3,37 @@ const { getMember } = require('./member.js');
 const { getMembersStatus } = require('./members.js');
 
 /**
+ * @param {number} memberId Expects member.id
+ * @returns {Promise<member.status | Error>} Returns a promisifed member's status
+ */
+const getMemberStatus = (memberId) => {
+  return getMember(memberId)
+    .then(member => {
+      return knex('status')
+        .join('status_type', 'status.status_type_id', 'status_type.id')
+        .select('status.id', 'status.address', 'status.description', 'status_type.name')
+        .then(statuses => {
+          const statusesFound = statuses.length > 0;
+          if (statusesFound) {
+            const statusId = member.status_id;
+            const statusFound = statuses.find(status => status.id === statusId);
+            if (statusFound) {
+              const { name, ...status } = statusFound;
+              status.type = name;
+              status.member_id = memberId;
+              return status;
+            } 
+          } 
+          throw new Error(`Could not find member of id '${memberId}'s status!`)
+        })
+        .catch(err => {
+          console.error(err.message);
+          throw err;
+        })
+    })
+}
+
+/**
  * @returns {Promise<status.status_type>} 
  */
 const getStatusTypes = () => {
@@ -46,36 +77,54 @@ const getMembersOfStatusType = (statusType) => {
     })
 }
 
-// /**
-//  * @param {number} memberId 
-//  */
-// const updateMemberStatus = (memberId) => {
-//  // ToDo
-// }
-
-//change or remove if needed 
 /**
  * @param {number} memberId 
- * @param {number} statusTypeId 
+ * @param {{
+ *  status_type_id: number,
+ *  address: string,
+ *  description: string
+ * }} status
  * @returns {Promise<member>}
  */
-const updateMemberStatus = (memberId, statusTypeId) => {
-  return knex('member')
-    .where('id', memberId)
-    .update({ status_type_id: statusTypeId }, ['*'])
-    .then((updatedMembers) => {
-      const updatedMember = updatedMembers[0];
-      if (!updatedMember) {
-        throw new Error(`Failed to update status for member ${memberId}`);
+const updateMemberStatus = (memberId, status) => {
+  return getMember(memberId)
+    .then(member => {
+      const statusId = member.status_id;
+      if (statusId) {
+        return knex('status')
+          .where('id', statusId)
+          .update(status, ['*'])
+          .then(statuses => {
+            const statusFound = statuses.length > 0;
+            if (statusFound) {
+              const newStatus = statuses[0];
+              return newStatus;
+            }
+          })
+          .catch(err => {
+            console.error(err.message);
+            throw new Error(`Failed to update member of id '${memberId}'s status!`);
+          })
+      } else {
+        return knex('status')
+          .insert(status, ['*'])
+          .then(statuses => {
+            const statusFound = statuses.length > 0;
+            if (statusFound) {
+              const newStatus = statuses[0];
+              return knex('member')
+                .where('id', memberId)
+                .update('status_id', newStatus.id)
+                .then(() => newStatus)
+            } else {
+              throw new Error(`Failed to create new status for member of id '${memberId}'s status!`);
+            }
+          })
+        
       }
-      return updatedMember;
     })
-    .catch((error) => {
-      console.error(error);
-      throw new Error('Failed to update member status in the database.');
-    });
 }
 
-module.exports = { getStatusTypes, getMembersOfStatusType, updateMemberStatus };
+module.exports = { getMemberStatus, getStatusTypes, getMembersOfStatusType, updateMemberStatus };
 
 
