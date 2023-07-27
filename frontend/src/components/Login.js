@@ -23,7 +23,8 @@ const Login = () => {
             console.log(res)
             return res.json
             })
-        .then(() => {alert('Logged in successfully')})
+        .then(() => {alert('Logged in successfully');
+        setTimeout(window.location.href = '/maps', 3000)})
         
     }
 
