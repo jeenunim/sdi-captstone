@@ -32,7 +32,7 @@ app.post('/login', (req, res) => {
   authenticationController.login(username, password)
     .then(member => {
       res.cookie('memberId', member.id, {
-        httpOnly: true,
+        httpOnly: false,
         secure: false,
         sameSite: 'lax',
         path: '/',

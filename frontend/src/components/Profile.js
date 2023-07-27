@@ -7,15 +7,18 @@ const Profile = () => {
     const { renderList } = useContext(AppContext);
 
     function getCookie(name) {
-        const cookieString = document.cookie
+        const cookieString = document.cookie;
         const cookies = cookieString.split("; ");
       
-        for (let i = 0;  i < cookies.length; i++) {
-          if (cookies[0] === name) {
-            return cookies[1];
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].split("=");
+          if (cookie[0] === name) {
+            return decodeURIComponent(cookie[1]);
           }
         }
-    }
+      
+        return null;
+      }
     console.log("getCookie", getCookie('memberId'))
 
     // Check if renderList is empty or undefined
@@ -36,7 +39,7 @@ const Profile = () => {
             </tr>
           </thead>
           <tbody>
-            {renderList.map((item) => (
+            {renderList?.find(e => e.id === getCookie('memberId'))?.map((item) => (
               <tr key={item.id}>
                 <td>{item.first_name}</td>
                 <td>{item.last_name}</td>
