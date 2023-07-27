@@ -25,7 +25,7 @@ app.post('/login', (req, res) => {
 
   login(username, password)
     .then(member => {
-      res.cookie('memberId', member.id, {httpOnly: true }); //prevent XSS
+      res.cookie('memberId', member.id);
       res.status(200).send(JSON.stringify({
         message: 'Login success', 
         member: member
@@ -44,6 +44,7 @@ app.post('/sign-up', (req, res) => {
 
   signUp(username, password, first_name, last_name)
     .then(member => {
+      res.cookie('memberId', member.id, {httpOnly: true }); //prevent XSS
       res.status(201).send(JSON.stringify({
         message: 'Successfully signed up!',
         member: member
