@@ -9,7 +9,13 @@ const { getMembers, getMembersStatus, getMembersSupervisor } = require('./contro
 const { getStatusTypes, getMembersOfStatusType } = require('./controllers/status.js');
 const { login, signUp } = require('./controllers/authentication.js');
 
-app.use(cors());
+const corsOptions = {
+  origin: 'http://localhost:3000',
+  optionsSuccessStatus: 200,
+  credentials: true
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 
@@ -25,7 +31,14 @@ app.post('/login', (req, res) => {
 
   login(username, password)
     .then(member => {
-      res.cookie('memberId', member.id);
+      res.cookie('memberId', member.id, {
+        httpOnly: true,
+        secure: false,
+        sameSite: 'lax',
+        path: '/',
+        expires: 0,
+        signed: false
+      });
       res.status(200).send(JSON.stringify({
         message: 'Login success', 
         member: member
