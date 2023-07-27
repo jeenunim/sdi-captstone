@@ -52,24 +52,40 @@ const getMemberSubordinates = (memberId) => {
 }
 
 /** 
-* @param {number} numberId
+* @param {number} memberId
 * @param {number} supervisorId
 * @returns {Promise<member>}
 */
 const updateMemberSupervisor = (memberId, supervisorId) => {
-  return knex('member')
-  .where('id', memberId)
-  .update({ supervisor_id: supervisorId}, ['*'])
-  .then((updatedMember) => {
-    if (!updatedMember || updatedMember.length === 0) {
-      throw new Error(`Failed to update supervisor for member ${memberId}`)
-    }
-    return updateMember[0];
-  })
-  .catch((error) => {
-    console.error(error);
-    throw new Error('Failed to update member supervisor in the database.')
-  })
+  return getMember(memberId)
+    .then(member => {
+      return getMember(supervisorId)
+        .then(supervisor => {
+          return knex('member')
+            .where('id', memberId)
+            .update({supervisor_id: supervisorId}, ['*'])
+            .then(members => {
+              const memberFound = members.length > 0;
+              if (memberFound) {
+                const member = members[0];
+                knex('member')
+                  .where('id', supervisorId)
+                  .update({is_supervisor: true})
+                return member;
+              } else {
+                throw new Error(`Failed to updated member of id '${memberId}'s supervisor!`)
+              }
+            })
+            .catch(err => {
+              console.error(err.message);
+              throw err;
+            })
+        })
+        .catch(err => {
+          console.error(err.message);
+          throw err;
+        })
+    })
 }
 
 /**
@@ -155,4 +171,41 @@ const getMemberRank = (memberId) => {
       })
 }
 
-module.exports = { getMember, getMemberSubordinates, getMemberSupervisor, getMemberStatus, getMemberRank }
+/**
+ * @param {number} memberId 
+ * @param {{
+    * first_name: string, 
+    * last_name: string, 
+    * password: string, 
+    * branch_id: number, 
+    * rank_id: number, 
+    * office_symbol: string, 
+    * org_id: number, 
+    * supervisor_id: number, 
+    * is_commander: boolean
+ * }} profile 
+ */
+const updateMemberProfile = (memberId, profile) => {
+  return getMember(memberId)
+    .then(member => {
+      return knex('member')
+        .update(profile, ['*'])
+        .then(members => {
+          const memberFound = members.length > 0;
+          if (memberFound) {
+            const { password, ...member } = members[0];
+            return member;
+          }
+        })
+        .catch(err => {
+          console.error(err.message);
+          throw new Error(`Failed to update member of id '${memberId}'s profile!`);
+        })
+    })
+    .catch(err => {
+      console.error(err.message);
+      throw err;
+    })
+}
+
+module.exports = { getMember, getMemberSubordinates, getMemberSupervisor, updateMemberSupervisor, getMemberStatus, getMemberRank, updateMemberProfile }
