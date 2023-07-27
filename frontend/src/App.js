@@ -61,6 +61,8 @@ function App() {
     }
   }, [membersList, statusList, statusTypeList]);
   console.log(statusTypeList)
+  let cookies = document.cookie;
+  console.log(cookies.length)
 
   const provided = {
     membersList,
