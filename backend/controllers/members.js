@@ -1,5 +1,5 @@
 const knex = require('knex')(require('../knexfile.js')['development']);
-const { getMemberStatus } = require('./member.js');
+const { getMemberStatus } = require('./status.js');
 
 /**
  * @returns {Promise<member[] | Error>} Returns either a promisified array of member or error
