@@ -7,12 +7,11 @@ import AppContext from './AppContext';
 
 
 describe('App', () => {
-  const {membersList} = useContext(AppContext);
   
+  const membersList = useContext(AppContext);
+
   render(
-  <AppContextProvider>
   <App />
-  </AppContextProvider>
   )
 
   it('Holds member object from backend', async () => {
@@ -28,7 +27,7 @@ describe('App', () => {
       rank_id: expect.any(Number),
       office_symbol: expect.any(String),
       org_id: expect.any(Number),
-      supervisor_id: expect.toBe(null),
+      supervisor_id: expect.toBeInTheDocument(),
       status_id: expect.any(Number),
       is_supervisor: expect.any(Boolean),
       is_commander: expect.any(Boolean) 
