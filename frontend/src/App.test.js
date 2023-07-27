@@ -28,7 +28,7 @@ describe('App', () => {
       rank_id: expect.any(Number),
       office_symbol: expect.any(String),
       org_id: expect.any(Number),
-      supervisor_id: expect.toBeDefined(),
+      supervisor_id: expect.toBe(null),
       status_id: expect.any(Number),
       is_supervisor: expect.any(Boolean),
       is_commander: expect.any(Boolean) 

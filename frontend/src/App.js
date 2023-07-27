@@ -5,6 +5,7 @@ import GoogleMap from "./components/GoogleMap";
 import Header from "./components/Header";
 import AppContext from "./AppContext";
 import Login from "./components/Login";
+import Register from "./components/Register";
 import "./App.css";
 
 function App() {
@@ -58,7 +59,7 @@ function App() {
       setRenderList(mergedData);
     }
   }, [membersList, statusList, statusTypeList]);
-  console.log(statusTypeList.map(e => e))
+  console.log(statusTypeList)
 
   const provided = {
     membersList,
@@ -83,6 +84,7 @@ function App() {
         <Header />
         <Routes>
           <Route path="/" element={<Login />} />
+          <Route path="/signup" element={<Register />} />
           <Route path="/maps" element={<Overview />} />
         </Routes>
       </Router>
