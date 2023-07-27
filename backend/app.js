@@ -39,10 +39,10 @@ app.post('/login', (req, res) => {
 })
 
 app.post('/sign-up', (req, res) => {
-  /** @type {string} */
-  const username = req.body.username;
+  /** @type {{username:string, password:string, first_name:string, last_name:string}} */
+  const { username, password, first_name, last_name } = req.body;
 
-  signUp(username)
+  signUp(username, password, first_name, last_name)
     .then(member => {
       res.status(201).send(JSON.stringify({
         message: 'Successfully signed up!',

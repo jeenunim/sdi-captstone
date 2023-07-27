@@ -9,7 +9,10 @@ const getMembers = () => {
     .select('*')
     .then(members => {
       if (members.length > 0) {
-       return members
+       return members.map((member) => {
+        const { password, ...newMember } = member;
+        return newMember;
+       })
       } else {
         throw new Error('Members could not be found!')
       }

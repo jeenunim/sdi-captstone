@@ -26,7 +26,14 @@ const login = (username, password) => {
  * @param {string} username 
  * @returns {member}
  */
-const signUp = (username) => {
+const signUp = (username, password, firstName, lastName) => {
+  if (username === undefined) {
+    return Promise.reject(new Error('Username is a required field!'));
+  } else if (typeof username !== 'string') {
+    return Promise.reject(new Error('Username must be of type string'));
+  } else if (username.length < 3) {
+    return Promise.reject(new Error('Username must be at least 3 characters long'));
+  }
   return knex('member')
     .where('username', username)
     .then(members => {
@@ -34,7 +41,33 @@ const signUp = (username) => {
       if (memberFound) {
           throw new Error('Username taken!');
       } else {
-        const newMember = req.body;
+        if (password === undefined) {
+          throw new Error('Password is a required field!')
+        } else if (typeof password !== 'string') {
+          throw new Error('Password must be of type string');
+        } else if (password.length < 8) {
+          throw new Error('Password must be at least 8 characters long');
+        }
+        if (firstName === undefined) {
+          throw new Error('First name is a required field!')
+        } else if (typeof firstName !== 'string') {
+          throw new Error('First name must be of type string');
+        } else if (firstName.length < 1) {
+          throw new Error('First name is a required field');
+        }
+        if (lastName === undefined) {
+          throw new Error('Last name is a required field!')
+        } else if (typeof lastName !== 'string') {
+          throw new Error('Last name must be of type string');
+        } else if (lastName.length < 1) {
+          throw new Error('Last name is a required field');
+        }
+        const newMember = {
+          username: username,
+          password: password,
+          first_name: firstName,
+          last_name: lastName
+        }
         return knex('member')
           .insert(newMember, ['*'])
           .then(members => {
@@ -47,7 +80,7 @@ const signUp = (username) => {
       }
     })
   .catch(err => {
-    throw new Error('Could not create new account');
+    throw err;
   })
 }
 
