@@ -1,6 +1,5 @@
 const knex = require('knex')(require('../knexfile.js')['development']);
 const { getMember } = require('./member.js');
-const { getMembersStatus } = require('./members.js');
 
 /**
  * @param {number} memberId Expects member.id
