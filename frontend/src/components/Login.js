@@ -1,21 +1,28 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ParentContext } from '../App'
+import AppContext from "../AppContext";
 
 const Login = () => {
-    const { userData } = useContext(ParentContext)
     const [ username, setUsername ] = useState('')
-    let user = userData.map((e) => e.Username)
-    console.log(user)
+    const [ password, setPassword ] = useState('')
+
     const handleSubmit = (e) => {
         e.preventDefault();
-        if(user.includes(username)) {
-            alert(`Logged in successfully, welcome ${username}`)
-            localStorage.setItem('username', username)
-            window.location.href = '/'
-        } else {
-            alert('This username does not exist. Please try again.')
-        }
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(
+                {username,
+                password
+                }
+                )
+        };
+        fetch('http://localhost:8080/login', requestOptions)
+        .then(res => {
+            console.log(res)
+            return res.json
+            })
+        .then(() => {alert('Logged in successfully')})
         
     }
 
@@ -32,11 +39,19 @@ const Login = () => {
                     onChange={(e) => setUsername(e.target.value)}
                     >
                     </input>
+                    <br></br>
+                    <label for='text'>Password: </label>
+                    <input
+                    name="password"
+                    type='text'
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    >
+                    </input>
+                    <br></br>
                     <button>Log In</button>
                 </form>
-                <div className='link-container'>
-                    <Link to={'/register'}>Register for an Account!</Link>
-                </div>
             </div>
         </main>
     )
