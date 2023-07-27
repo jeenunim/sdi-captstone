@@ -4,10 +4,10 @@ const port = 8080;
 const knex = require('knex')(require('./knexfile.js')['development']);
 const cookieParser = require('cookie-parser'); // the import of cookies
 const cors = require('cors');
-const { getMember, getMemberSubordinates, getMemberSupervisor, updateMemberSupervisor, getMemberRank, updateMemberProfile } = require('./controllers/member.js');
-const { getMembers, getMembersStatus, getMembersSupervisor } = require('./controllers/members.js');
-const { getMemberStatus, getStatusTypes, getMembersOfStatusType, updateMemberStatus } = require('./controllers/status.js');
-const { login, signUp } = require('./controllers/authentication.js');
+const memberController = require('./controllers/member.js');
+const membersController = require('./controllers/members.js');
+const statusController = require('./controllers/status.js');
+const authenticationController = require('./controllers/authentication.js');
 
 const corsOptions = {
   origin: 'http://localhost:3000',
@@ -29,7 +29,7 @@ app.post('/login', (req, res) => {
   /** @type {{ username:string, password:string} } */
   const { username, password } = req.body;
 
-  login(username, password)
+  authenticationController.login(username, password)
     .then(member => {
       res.cookie('memberId', member.id, {
         httpOnly: true,
@@ -55,7 +55,7 @@ app.post('/sign-up', (req, res) => {
   /** @type {{username:string, password:string, first_name:string, last_name:string}} */
   const { username, password, first_name, last_name } = req.body;
 
-  signUp(username, password, first_name, last_name)
+  authenticationController.signUp(username, password, first_name, last_name)
     .then(member => {
       res.cookie('memberId', member.id, {httpOnly: true }); //prevent XSS
       res.status(201).send(JSON.stringify({
@@ -73,7 +73,7 @@ app.post('/sign-up', (req, res) => {
 
 // Request all members
 app.get('/members', (req, res) => {
-  getMembers()
+  membersController.getMembers()
     .then(members => {
       res.status(200).send(JSON.stringify({
         message: 'Members found!',
@@ -89,7 +89,7 @@ app.get('/members', (req, res) => {
 
 // Request status of all members
 app.get('/members/statuses', (req, res) => {
-  getMembersStatus()
+  membersController.getMembersStatus()
     .then(statuses => {
       res.status(200).send(JSON.stringify({
         message: `Found all members' status!`,
@@ -107,7 +107,7 @@ app.get('/members/status_type/:statusType', (req, res) => {
   /** @type {string} */
   const statusType = req.params.statusType;
 
-  getMembersOfStatusType(statusType)
+  membersController.getMembersOfStatusType(statusType)
     .then(members => {
       res.status(200).send(JSON.stringify({
         message: `Found members of status type, '${statusType}'`,
@@ -123,7 +123,7 @@ app.get('/members/status_type/:statusType', (req, res) => {
 
 // Requests supervisors of all members
 app.get('/members/supervisors', (req, res) => {
-  getMembersSupervisor()
+  membersController.getMembersSupervisor()
     .then(supervisors => {
       res.status(200).send(JSON.stringify({
         message: 'Supervisors found!',
@@ -142,7 +142,7 @@ app.get('/member/:memberId', (req, res) => {
   /** @type {number} */
   const memberId = req.params.memberId;
 
-  getMember(memberId)
+  memberController.getMember(memberId)
     .then(member => {
       res.status(200).send(JSON.stringify({
         message: 'Member found!',
@@ -161,7 +161,7 @@ app.get('/member/:memberId/subordinates', (req, res) => {
   /** @type {number} */
   const memberId = req.params.memberId;
 
-  getMemberSubordinates(memberId)
+  memberController.getMemberSubordinates(memberId)
     .then(subordinates => {
       res.status(200).send(JSON.stringify({
         message: 'Subordinates found!',
@@ -182,7 +182,7 @@ app.patch('/member/:memberId/supervisor', (req, res) => {
   /** @type {number} */
   const supervisorId = req.body.supervisor_id;
 
-  updateMemberSupervisor(memberId, supervisorId)
+  memberController.updateMemberSupervisor(memberId, supervisorId)
     .then(member => {
       res.status(200).send(JSON.stringify({
         message: 'Successfully updated supervisor!',
@@ -201,7 +201,7 @@ app.get('/member/:memberId/supervisor', (req, res) => {
   /** @type {number} */
   const memberId = req.params.memberId;
 
-  getMemberSupervisor(memberId)
+  memberController.getMemberSupervisor(memberId)
   .then(supervisor => {
     res.status(200).send(JSON.stringify({
       message: 'Successfully retrieved supervisor!',
@@ -221,7 +221,7 @@ app.patch('/member/:memberId/profile', (req, res) => {
   /** @type {{first_name: string, last_name: string, password: string, branch_id: number, rank_id: number, office_symbol: string, org_id: number, supervisor_id: number, is_commander: boolean}}*/
   const profile = req.body;
 
-  updateMemberProfile(memberId, profile)
+  memberController.updateMemberProfile(memberId, profile)
     .then(member => {
       res.status(200).send(JSON.stringify({
         message: 'Successfully updated profile!',
@@ -240,7 +240,7 @@ app.get('/member/:memberId/status', (req, res) => {
   /** @type {number} */
   const memberId = req.params.memberId;
 
-  getMemberStatus(memberId)
+  statusController.getMemberStatus(memberId)
   .then(status => {
     res.status(200).send(JSON.stringify({
       message: 'Status found!',
@@ -261,7 +261,7 @@ app.patch('/member/:memberId/status', (req, res) => {
   /** @type {{status_type_id:number, address:string, description:string}} */
   const status = req.body;
 
-  updateMemberStatus(memberId, status)
+  statusController.updateMemberStatus(memberId, status)
   .then(status => {
     res.status(200).send(JSON.stringify({
       message: 'Status updated!',
@@ -275,13 +275,11 @@ app.patch('/member/:memberId/status', (req, res) => {
   })
 })
 
-
-
 app.get('/member/:memberId/rank', (req, res) => {
   /** @type {number} */
   const memberId = req.params.memberId;
 
-  getMemberRank(memberId)
+  memberController.getMemberRank(memberId)
     .then(rank => {
       res.status(200).send(JSON.stringify({
         message: 'Rank found!',
@@ -296,7 +294,7 @@ app.get('/member/:memberId/rank', (req, res) => {
 })
 
 app.get('/status_types', (req, res) => {
-  getStatusTypes()
+  statusController.getStatusTypes()
     .then(statusTypes => {
       res.status(200).send(JSON.stringify({
         message: 'Status types found!',

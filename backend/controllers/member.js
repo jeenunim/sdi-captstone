@@ -144,6 +144,10 @@ const updateMemberProfile = (memberId, profile) => {
           const memberFound = members.length > 0;
           if (memberFound) {
             const { password, ...member } = members[0];
+            if ('supervisor_id' in member) {
+              return updateMemberSupervisor(memberId, member.supervisor_id)
+                .then(() => member)
+            }
             return member;
           }
         })

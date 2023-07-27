@@ -6,6 +6,20 @@ const knex = require('knex')(require('../knexfile.js')['development']);
  * @returns {member}
  */
 const login = (username, password) => {
+  if (username === undefined) {
+    return Promise.reject(new Error('Username is a required field!'));
+  } else if (typeof username !== 'string') {
+    return Promise.reject(new Error('Username must be of type string'));
+  } else if (username.length === 0) {
+    return Promise.reject(new Error('Username is a required field!'));
+  }
+  if (password === undefined) {
+    return Promise.reject(new Error('Password is a required field!'));
+  } else if (typeof password !== 'string') {
+    return Promise.reject(new Error('Password must be of type string'));
+  } else if (password.length === 0) {
+    return Promise.reject(new Error('Password is a required field!'));
+  }
   return knex('member')
     .select('*')
     .where('username', username)
