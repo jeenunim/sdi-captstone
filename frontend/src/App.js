@@ -4,6 +4,7 @@ import Overview from "./components/Overview";
 import GoogleMap from "./components/GoogleMap";
 import Header from "./components/Header";
 import AppContext from "./AppContext";
+import Login from "./components/Login";
 import "./App.css";
 
 function App() {
@@ -81,6 +82,7 @@ function App() {
       <Router>
         <Header />
         <Routes>
+          <Route path="/" element={<Login />} />
           <Route path="/maps" element={<Overview />} />
         </Routes>
       </Router>
