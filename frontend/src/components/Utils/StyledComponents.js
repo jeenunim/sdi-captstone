@@ -72,7 +72,7 @@ export const Button = Styled.button`
   cursor: pointer;
   border: none;
   padding: 2vh;
-  color: ${({ theme }) => theme.secondaryText};
+  color: ${colorPalette.light.secondaryText};
   letter-spacing: 2px;
   margin-top: 2vh;
   margin-bottom: 2vh;
@@ -99,6 +99,7 @@ export const NavItem = Styled.div`
 export const Label = Styled.div`
   text-align: center;
   cursor: pointer;
+  color: ${({ theme }) => theme.text};
 `
 // export const StyledComponent = () => {
 //   const isDarkMode = useDarkMode();
