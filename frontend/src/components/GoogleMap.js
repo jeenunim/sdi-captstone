@@ -60,7 +60,8 @@ export default function GoogleMap() {
           // If marker exists, update its position
           markers.current[markerIndex].marker.setPosition(updatedCenter);
         } else {
-          const image = `/leaveMarker.png`;
+          let image;
+          member.status ? image = `/${member.status}Marker.png` : image = '/PresentMarker.png';
           const name = `${member.first_name} ${member.last_name}`
           // If marker doesn't exist, create a new marker
           const newMarker = new window.google.maps.Marker({
@@ -90,7 +91,9 @@ console.log(renderList)
       console.log(member)
       const location = member.address
       console.log('member location:', location)
+      if (location) {
       codeAddress(location, member);
+      }
     })
   }
   
