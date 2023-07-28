@@ -1,9 +1,11 @@
 import React, { useContext } from "react";
+import { Link, useNavigate } from 'react-router-dom'
 import { Table } from 'react-bootstrap';
 import AppContext from "../AppContext";
 
 const MemberData = () => {
   const { renderList } = useContext(AppContext);
+  const navigate = useNavigate();
 
   // Check if renderList is empty or undefined
   if (!renderList || renderList.length === 0) {
@@ -11,7 +13,7 @@ const MemberData = () => {
   }
 
   return (
-    <div>
+    <div style={{position: 'relative', left: '33%', right: "33%", height: "auto", width: "33%" }}>
       <Table striped bordered hover>
         <thead>
           <tr>

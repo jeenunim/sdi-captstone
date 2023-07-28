@@ -3,8 +3,8 @@ import { Table } from 'react-bootstrap';
 import { Link } from 'react-router-dom'
 import AppContext from "../AppContext";
 
-const Profile = () => {
-    const { mergedList, renderList, setRenderList } = useContext(AppContext);
+const EditProfile = () => {
+    const { renderList } = useContext(AppContext);
 
     function getCookie(name) {
         const cookieString = document.cookie;
@@ -19,20 +19,14 @@ const Profile = () => {
       
         return null;
       }
-      let currentUserId = getCookie('memberId')
-      console.log('current user: ' + currentUserId)
-      // const currentUserData = mergedList.find((obj) => obj.id === currentUserId);
-      // console.log(currentUserData)
-
-
     console.log("getCookie", getCookie('memberId'))
-    console.log(renderList.map((item) => item))
 
     // Check if renderList is empty or undefined
     if (!renderList || renderList.length === 0) {
       return <div>No member data available.</div>;
     }
     
+  
     return (
       <div>
         <Table striped bordered hover>

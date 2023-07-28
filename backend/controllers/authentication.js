@@ -85,7 +85,27 @@ const signUp = (username, password, firstName, lastName) => {
         return knex('member')
           .insert(newMember, ['*'])
           .then(members => {
-            const { password, ...member } = members[0];
+            const member = members[0];
+            const newStatus = { status_type_id: 3 };
+            return knex('status')
+              .insert(newStatus, ['*'])
+              .then(statuses => {
+                  const status = statuses[0];
+                  const newStatusId = { status_id: status.id };
+                  return knex('member')
+                    .where('id', member.id)
+                    .update(newStatusId, ['*'])
+                    .then(members => {
+                      const { password, ...member } = members[0];
+                      return member;
+                    })
+                    .catch(err => {
+                      throw new Error('Failed to update members status id');
+                    })
+              })
+              .catch(err => {
+                throw new Error('Failed to create new status for new member');
+              })
             return member;
           })
           .catch(err => {

@@ -23,6 +23,7 @@ export default function Overview() {
     setRenderList,
   } = useContext(AppContext);
 
+  console.log(mergedList);
   useEffect(() => {
     setRenderList(mergedList)
   }, []);

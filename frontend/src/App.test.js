@@ -1,69 +1,44 @@
-import { render, screen } from '@testing-library/react';
-import React, { useContext } from "react";
-import App from './App';
-import AppContext from './AppContext';
-// const request = require('supertest');
+import React from "react";
+import { render, act } from "@testing-library/react";
+import "@testing-library/jest-dom/extend-expect";
+import App from "./App";
+import AppContext from "./AppContext";
 
+global.fetch = jest.fn();
 
-describe('App', () => {
-  
-  const provided = {
-    membersList,
-    setMembersList,
-    statusList,
-    setStatusList,
-    renderList,
-    setRenderList
-  } = useContext(AppContext);
+const membersData = [
+  { name: "john" }
+];
 
-  render(
-  <AppContext.Provider value={membersList}>
-  <App />
-  </AppContext.Provider>
-  )
+const statusesData = [
+  { name: "john" }
+];
 
-  it('Holds member object from backend', async () => {
-    
-    expect(membersList)
-    .toEqual(expect.objectContaining({
-      id: expect.any(Number),
-      first_name: expect.any(String), 
-      last_name: expect.any(String),
-      username: expect.any(String),
-      password: expect.any(String),
-      branch_id: expect.any(Number),
-      rank_id: expect.any(Number),
-      office_symbol: expect.any(String),
-      org_id: expect.any(Number),
-      supervisor_id: expect.toBeInTheDocument(),
-      status_id: expect.any(Number),
-      is_supervisor: expect.any(Boolean),
-      is_commander: expect.any(Boolean) 
-    }))
-  })
+const statusTypesData = [
+  { name: "john" }
+];
 
-})
+const mockApiResponse = (data) => {
+  return Promise.resolve({
+    json: () => Promise.resolve(data),
+  });
+};
 
- // it('fetch /members --> array of a member', async () => {
-  //   return request(App)
-  //    .fetch("http://localhost:8080/members")
-  //    .expect('Content-Type', /json/)
-  //    .expect(200)
-  //    .then((response) => {
-  //     expect(response.body)
-  //     .toEqual(expect.arrayContaining([
-  //         expect.objectContaining({
-  //         id: expect.any(Number),
-  //         first_name: expect.any(String), 
-  //         last_name: expect.any(String),
-  //         username: expect.any(String),
-  //         password: expect.any(String),
-  //         branch_id: expect.any(Number),
-  //         rank_id: expect.any(Number),
-  //         office_symbol: expect.any(String),
-  //         org_id: expect.any(Number),
-  //         status_id: expect.any(Number),
-  //         is_supervisor: expect.any(Boolean),
-  //         is_commander: expect.any(Boolean)
-  // })]))});    
-  // });
+describe("App", () => {
+  beforeEach(() => {
+    global.fetch.mockReset();
+  });
+
+  it("renders error message when data fetching fails", async () => {
+    global.fetch.mockRejectedValueOnce("Failed to fetch");
+
+    let getByText;
+    await act(async () => {
+      const { getByText: getByTextAsync } = render(<App />);
+      getByText = getByTextAsync;
+    });
+
+    expect(getByText("Error fetching data. Please try again later.")).toBeInTheDocument();
+  });
+
+  });

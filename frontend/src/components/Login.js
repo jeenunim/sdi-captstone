@@ -1,10 +1,19 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import AppContext from "../AppContext";
 
 const Login = () => {
     const [ username, setUsername ] = useState('')
     const [ password, setPassword ] = useState('')
+    const { userId, setUserId } = useContext(AppContext);
+    const navigate = useNavigate();
+
+    const handleLogin = (data) => {
+        const { message, member } = data;
+        setUserId(member.id);
+        alert(message);
+        setTimeout(() => {navigate('/')}, 3000);
+    }
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -12,19 +21,19 @@ const Login = () => {
             credentials: 'include',
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(
-                {username,
+            body: JSON.stringify({
+                username,
                 password
-                }
-                )
+            })
         };
         fetch('http://localhost:8080/login', requestOptions)
-        .then(res => {
-            console.log(res)
-            return res.json
+            .then(res => res.json())
+            .then(data => {
+                handleLogin(data);
             })
-        .then(() => {alert('Logged in successfully');
-        setTimeout(window.location.href = '/maps', 3000)})
+            .catch(err => {
+                alert(err.message);
+            })
         
     }
 
