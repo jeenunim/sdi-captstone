@@ -2,44 +2,9 @@ import React, { useState, useEffect, useContext } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import Styled from 'styled-components'
 import AppContext from "../AppContext";
-
-const Container = Styled.div`
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        height: 50px;
-        box-shadow: 0px 0px 16px #0008;
-        margin-bottom: 5vh;
-    `;
-
-    const HomeButton = Styled.div`
-        display: inline-block;
-        cursor: pointer;
-        font-weight: bold;
-        padding: 10px;
-        letter-spacing: 1px;
-    `;
-
-    const LoginButton = Styled.div`
-        display: inline-block;
-        cursor: pointer;
-        padding: 10px;
-        letter-spacing: 1px;
-    `;
-
-    const ProfileButton = Styled.div`
-        display: inline-block;
-        cursor: pointer;
-        padding: 10px;
-        letter-spacing: 1px;
-    `;
-
-    const LogoutButton = Styled.div`
-        display: inline-block;
-        cursor: pointer;
-        padding: 10px;
-        letter-spacing: 1px;
-    `;
+import { NavItem } from './Utils/StyledComponents';
+import { notify } from './Utils/Toaster';
+import { HeaderContainer as Container } from './Utils/StyledComponents';
 
 const Header = () => {
 
@@ -55,24 +20,25 @@ const Header = () => {
         document.cookie = `memberId=${userId};expires=Thu, 01 Jan 1970 00:00:00 GMT`;
         setUserId(0);
         navigate('/login');
+        notify('Logged out successfully!', 'success');
     }
 
     const render = () => {
         if (isLoggedIn) {
             return (
                 <>
-                    <ProfileButton onClick={() => navigate('/profile')}>
+                    <NavItem onClick={() => navigate('/profile')}>
                         Profile
-                    </ProfileButton>
-                    <LogoutButton onClick={handleLogout}>
+                    </NavItem>
+                    <NavItem onClick={handleLogout}>
                         Logout
-                    </LogoutButton>
+                    </NavItem>
                 </>
             )
         } else {
-            <LoginButton onClick={handleLogin}>
+            <NavItem onClick={handleLogin}>
                 Login
-            </LoginButton>
+            </NavItem>
         }
     }
 
@@ -82,9 +48,9 @@ const Header = () => {
 
     return (
         <Container>
-            <HomeButton onClick={() => navigate('/')}>
+            <NavItem onClick={() => navigate('/')}>
                 Home
-            </HomeButton>
+            </NavItem>
             {render()}
         </Container>
     )

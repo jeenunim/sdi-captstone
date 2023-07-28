@@ -1,6 +1,8 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import AppContext from "../AppContext";
+import { Container, Input, Button, Label } from './Utils/StyledComponents';
+import { notify } from './Utils/Toaster';
 
 const Login = () => {
     const [ username, setUsername ] = useState('')
@@ -11,12 +13,12 @@ const Login = () => {
     const handleLogin = (data) => {
         const { message, member } = data;
         setUserId(member.id);
-        alert(message);
-        setTimeout(() => {navigate('/')}, 3000);
+        notify(message, 'success');
+        navigate('/');
     }
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
+    const handleSubmit = (event) => {
+        event.preventDefault();
         const requestOptions = {
             credentials: 'include',
             method: 'POST',
@@ -32,42 +34,35 @@ const Login = () => {
                 handleLogin(data);
             })
             .catch(err => {
-                alert(err.message);
+                notify(err.message, 'error');
             })
         
     }
 
     return (
-        <main>
-            <div className='login-card'>
+        <Container>
                 <form onSubmit={handleSubmit}>
-                    <label for='text'>Username: </label>
-                    <input
-                    name="username"
-                    type='text'
-                    required
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                    <Input
+                        type='text'
+                        placeholder='Username'
+                        required
+                        value={username}
+                        onChange={(event) => setUsername(event.target.value)}
                     >
-                    </input>
-                    <br></br>
-                    <label for='text'>Password: </label>
-                    <input
-                    name="password"
-                    type='text'
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    </Input>
+                    <Input
+                        type='password'
+                        placeholder='Password'
+                        required
+                        value={password}
+                        onChange={(event) => setPassword(event.target.value)}
                     >
-                    </input>
+                    </Input>
                     <br></br>
-                    <button>Log In</button>
+                    <Button>Log In</Button>
                 </form>
-            <div className='link-container'>
-                <Link to={'/signup'}>Don't have an account? Sign-up here!</Link>
-            </div>
-            </div>
-        </main>
+                <Label onClick={(event) => {navigate('/signup')} }>Dont't have an account?<br/>Sign up here!</Label>
+        </Container>
     )
 }
 

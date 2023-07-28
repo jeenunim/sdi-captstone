@@ -37,7 +37,6 @@ export default function GoogleMap() {
       );
     }
   }, []);
-
   const codeAddress = (address, member) => {
     // Check if the geocoder and mapRef are available
     if (!window.google || !window.google.maps || !mapRef.current) {
