@@ -22,10 +22,10 @@ const Register = () => {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                username,
-                password,
-                first_name,
-                last_name
+                username: username,
+                password: password,
+                first_name: first_name,
+                last_name: last_name
             })
         };
         fetch('http://localhost:8080/sign-up', requestOptions)

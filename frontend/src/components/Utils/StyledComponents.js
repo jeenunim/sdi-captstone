@@ -90,7 +90,7 @@ export const Input = Styled.input`
   outline: none;
   border: none;
   padding: 1vh;
-  border-bottom: 1px solid ${({ theme }) => theme.text};
+  border-bottom: 1px solid ${({ theme }) => theme.border};
   min-height: 30px;
   width: 100%;
   color: ${({ theme }) => theme.text};
@@ -109,7 +109,7 @@ export const Button = Styled.button`
   margin-top: 2vh;
   margin-bottom: 2vh;
   &:hover {
-    background-color: #546a26;
+    background-color: ##546a26;
   }
   min-height: 40px;
   width: 100%;

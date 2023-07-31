@@ -29,6 +29,7 @@ exports.seed = async function(knex) {
       rank_id: 5,
       office_symbol: 'USSF/SSC/S2',
       org_id: 2,
+      supervisor_id: 1,
       status_id: 2
     }
   ]);

@@ -12,6 +12,9 @@ const getMember = (memberId) => {
       const memberFound = members.length > 0;
       if (memberFound) {
         const { password, ...member } = members[0];
+        member.getDisplayName = () => {
+          return `${member.first_name} ${member.last_name}`
+        }
         return member
       } else {
         throw new Error(`Could not find member of id '${memberId}'`);
@@ -30,7 +33,7 @@ const getMember = (memberId) => {
 const getMemberSubordinates = (memberId) => {
   return getMember(memberId)
     .then(member => {
-      knex('member')
+      return knex('member')
         .select('*')
         .where('supervisor_id', memberId)
         .then(subordinates => {

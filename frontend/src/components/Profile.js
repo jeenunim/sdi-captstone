@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react'
 import AppContext from "../AppContext";
-import { Container, Button, Heading, Subheading, Divider, Field, EditButton, SaveButton, CancelButton } from './Utils/StyledComponents';
+import { Container, Button, Heading, Subheading, Divider, Field, EditButton,  CancelButton, Input } from './Utils/StyledComponents';
 import { useNavigate } from 'react-router-dom'
 import Styled from 'styled-components';
 
@@ -66,7 +66,7 @@ const Profile = () => {
   }, []);
 
   const handleSaveChanges = () => {
-    
+
   }
 
   const toggleEditMode = () => setIsEditMode(!isEditMode);
@@ -84,13 +84,22 @@ const Profile = () => {
           <Field name='Supervisor' data={supervisor && `${supervisor.first_name} ${supervisor.last_name}`} />
           <Divider />
           <Subheading>Personal</Subheading>
-          <Field name='First Name' data={member?.first_name} />
-          <Field name='Last Name' data={member?.last_name} />
+          <Input 
+            placeholder='First Name'
+            defaultValue={member?.first_name}
+          />
+          <Input 
+            placeholder='Last Name'
+            defaultValue={member?.last_name}
+          />
           <Field name='Rank' data={rank?.title} />
           <Divider />
           <Subheading>Status</Subheading>
           <Field name='Type' data={status?.type} />
-          <Field name='Address' data={status?.address} />
+          <Input 
+            placeholder='Address'
+            defaultValue={status?.address}
+          />
           <Button>Save Changes</Button>
         </>
       );

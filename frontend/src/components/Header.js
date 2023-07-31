@@ -36,7 +36,7 @@ const Header = () => {
                 </>
             )
         } else {
-            return(
+            return (
                 <NavItem onClick={handleLogin}>
                     Login
                 </NavItem>
