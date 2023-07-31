@@ -1,5 +1,7 @@
 import { ToastContainer, toast } from 'react-toastify';
+import { useContext } from 'react';
 import 'react-toastify/dist/ReactToastify.css';
+import AppContext from "../../AppContext";
 
 export const notify = (message, type, position='top-center') => {
   const settings = {
@@ -11,18 +13,19 @@ export const notify = (message, type, position='top-center') => {
     draggable: false,
     progress: undefined,
     theme: "light",
-    }
+  }
 
   if (type === undefined) {
     toast(message, settings);
   } else if (type === 'error') {
-    toast.error(message, settings);
+    toast.error('stinky', settings); //is stinky
   } else if (type === 'success') {
     toast.success(message, settings);
   }
 } 
 
 const Toaster = () => {
+  const { isDarkMode } = useContext(AppContext);
   return (<ToastContainer
     position="bottom-right"
     autoClose={2500}
@@ -33,7 +36,7 @@ const Toaster = () => {
     pauseOnFocusLoss
     draggable={false}
     pauseOnHover
-    theme="light"
+    theme={isDarkMode ? 'dark' : 'light'}
   />);
 }
 

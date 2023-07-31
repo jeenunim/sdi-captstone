@@ -1,5 +1,5 @@
 import React from "react";
-import { render, act } from "@testing-library/react";
+import { render, act, screen } from "@testing-library/react";
 import "@testing-library/jest-dom/extend-expect";
 import App from "./App";
 import AppContext from "./AppContext";
@@ -32,13 +32,13 @@ describe("App", () => {
   it("renders error message when data fetching fails", async () => {
     global.fetch.mockRejectedValueOnce("Failed to fetch");
 
-    let getByText;
-    await act(async () => {
-      const { getByText: getByTextAsync } = render(<App />);
-      getByText = getByTextAsync;
-    });
+    // let getByText;
+    // await act(async () => {
+    //   const { getByText: getByTextAsync } = render(<App />);
+    //   getByText = getByTextAsync;
+    // });
 
-    expect(getByText("Error fetching data. Please try again later.")).toBeInTheDocument();
+    expect(screen.getByText("Error fetching data. Please try again later.")).toBeInTheDocument();
   });
 
   });

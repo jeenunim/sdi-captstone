@@ -1,14 +1,18 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import AppContext from "../AppContext";
-import { Container, Input, Button, Label } from './Utils/StyledComponents';
+import { Container, Input, Button, Label, Heading } from './Utils/StyledComponents';
 import { notify } from './Utils/Toaster';
 
 const Login = () => {
     const [ username, setUsername ] = useState('')
     const [ password, setPassword ] = useState('')
-    const { userId, setUserId } = useContext(AppContext);
+    const { userId, setUserId, isDarkMode } = useContext(AppContext);
     const navigate = useNavigate();
+
+    if (userId > 0) {
+        navigate('/');
+    }
 
     const handleLogin = (data) => {
         const { message, member } = data;
@@ -40,28 +44,29 @@ const Login = () => {
     }
 
     return (
-        <Container>
-                <form onSubmit={handleSubmit}>
-                    <Input
-                        type='text'
-                        placeholder='Username'
-                        required
-                        value={username}
-                        onChange={(event) => setUsername(event.target.value)}
-                    >
-                    </Input>
-                    <Input
-                        type='password'
-                        placeholder='Password'
-                        required
-                        value={password}
-                        onChange={(event) => setPassword(event.target.value)}
-                    >
-                    </Input>
-                    <br></br>
-                    <Button>Log In</Button>
-                </form>
-                <Label onClick={(event) => {navigate('/signup')} }>Dont't have an account?<br/>Sign up here!</Label>
+        <Container isDarkMode={isDarkMode}>
+            <Heading>Existing Member Login</Heading>
+            <form onSubmit={handleSubmit}>
+                <Input
+                    type='text'
+                    placeholder='Username'
+                    required
+                    value={username}
+                    onChange={(event) => setUsername(event.target.value)}
+                >
+                </Input>
+                <Input
+                    type='password'
+                    placeholder='Password'
+                    required
+                    value={password}
+                    onChange={(event) => setPassword(event.target.value)}
+                >
+                </Input>
+                <br></br>
+                <Button>Log In</Button>
+            </form>
+            <Label onClick={(event) => {navigate('/signup')} }>Sign Up</Label>
         </Container>
     )
 }

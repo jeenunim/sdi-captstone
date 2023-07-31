@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { Table } from 'react-bootstrap';
-import { Link } from 'react-router-dom'
 import AppContext from "../AppContext";
 
 const EditProfile = () => {
@@ -53,4 +52,4 @@ const EditProfile = () => {
     );
 }
 
-export default Profile
+export default EditProfile

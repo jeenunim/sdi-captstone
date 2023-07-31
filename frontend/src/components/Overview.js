@@ -1,20 +1,17 @@
-import React, { useState, useEffect, useRef, useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import MemberData from "./MemberData";
 import GoogleMap from "./GoogleMap";
 import AppContext from "../AppContext";
 
-export default function Overview() {
-  const {
-    mergedList,
-    renderList,
-    setRenderList,
-  } = useContext(AppContext);
+export default function Overview({ mergedList }) {
+  const { setRenderList, renderList } = useContext(AppContext);
 
   useEffect(() => {
-    setRenderList(mergedList)
-  }, []);
+    // Set the mergedList from App.js to the renderList in Overview.js
+    setRenderList(mergedList);
+  }, [mergedList, setRenderList]);
 
-console.log('renderList: ', renderList)
+  console.log('renderList: ', renderList);
 
   return (
     <main>

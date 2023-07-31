@@ -1,24 +1,18 @@
-import React, { useState, useEffect, useRef, useContext } from "react";
+import React, { useContext, useEffect, useRef } from "react";
 import GoogleMapReact from "google-map-react";
-import MemberData from "./MemberData";
-import dotenv from 'dotenv';
-import loadjs from "loadjs";
 import AppContext from "../AppContext";
+import loadjs from "loadjs";
 
 export default function GoogleMap() {
-  const [apiKey, setApiKey] = useState(null);
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [loadError, setLoadError] = useState(false);
+  const [apiKey, setApiKey] = React.useState(null);
+  const [isLoaded, setIsLoaded] = React.useState(false);
+  const [loadError, setLoadError] = React.useState(false);
   const mapRef = useRef(null);
   const defaultZoom = 4.5;
   const markers = useRef([]);
-
-  const [isLoading, setIsLoading] = useState(true);
-
-  const {renderList} = useContext(AppContext);
+  const { renderList } = useContext(AppContext);
 
   useEffect(() => {
-    // Fetch your API key from an environment variable or any other method you prefer.
     const apiKeyFromEnv = process.env.REACT_APP_API_KEY;
     setApiKey(apiKeyFromEnv);
     if (apiKeyFromEnv) {
@@ -37,6 +31,7 @@ export default function GoogleMap() {
       );
     }
   }, []);
+
   const codeAddress = (address, member) => {
     // Check if the geocoder and mapRef are available
     if (!window.google || !window.google.maps || !mapRef.current) {
@@ -60,7 +55,7 @@ export default function GoogleMap() {
           markers.current[markerIndex].marker.setPosition(updatedCenter);
         } else {
           let image;
-          member.status ? image = `/${member.status}Marker.png` : image = '/PresentMarker.png';
+          member.status ? (image = `/${member.status}Marker.png`) : (image = '/PresentMarker.png');
           const name = `${member.first_name} ${member.last_name}`
           // If marker doesn't exist, create a new marker
           const newMarker = new window.google.maps.Marker({
@@ -84,38 +79,45 @@ export default function GoogleMap() {
     return <div>Error loading Google Maps. Please try again later.</div>;
   }
 
-console.log(renderList)
   const generateMarkers = () => {
+    console.log(renderList);
+    // Clear existing markers when renderList changes
+    markers.current.forEach((markerData) => {
+      markerData.marker.setMap(null);
+    });
+    markers.current = [];
+
     renderList.forEach(member => {
       console.log(member)
       const location = member.address
       console.log('member location:', location)
       if (location) {
-      codeAddress(location, member);
+        codeAddress(location, member);
       }
     })
   }
   
-if (renderList) {
-  return (
-    <main>
-      <div style={{position: 'relative', left: '5%', height: "40vh", width: "90%" }}>
-        {isLoaded && apiKey && (
-          <GoogleMapReact
-            bootstrapURLKeys={{ key: apiKey }}
-            defaultCenter={{ lat: 39.0902, lng: -95.7129 }}
-            defaultZoom={defaultZoom}
-            options={{
-              mapTypeId: "hybrid",
-            }}
-            onGoogleApiLoaded={({ map }) => (mapRef.current = map)}
-            onChange={({ center }) => {
-              generateMarkers();
-            }}
-          />
-        )}
-      </div>
-    </main>
-  );
-}
+  if (renderList) {
+    return (
+      <main>
+        <div style={{position: 'relative', height: "40vh", width: "100vw", marginTop: '-5vh' }}>
+          {isLoaded && apiKey && (
+            <GoogleMapReact
+              bootstrapURLKeys={{ key: apiKey }}
+              defaultCenter={{ lat: 39.0902, lng: -95.7129 }}
+              defaultZoom={defaultZoom}
+              options={{
+                mapTypeId: "hybrid",
+              }}
+              onGoogleApiLoaded={({ map }) => (mapRef.current = map)}
+              onChange={({ center }) => {
+                generateMarkers();
+              }}
+            />
+          )}
+        </div>
+      </main>
+    );
+  }
+  return null;
 }

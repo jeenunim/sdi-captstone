@@ -1,12 +1,19 @@
-import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import React, { useState, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
+import AppContext from "../AppContext";
+import { Container, Input, Button, Label, Heading } from './Utils/StyledComponents';
 
 const Register = () => {
-
+    const { userId } = useContext(AppContext);
     const [first_name, setFirstName] = useState('');
     const [last_name, setLastName] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const navigate = useNavigate();
+
+    if (userId > 0) {
+        navigate('/');
+    }
 
     const handleSubmit = (e) => {
         // Simple POST request with a JSON body using fetch
@@ -14,13 +21,12 @@ const Register = () => {
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(
-                {username,
+            body: JSON.stringify({
+                username,
                 password,
                 first_name,
-                last_name 
-                }
-                )
+                last_name
+            })
         };
         fetch('http://localhost:8080/sign-up', requestOptions)
         .then(() => {alert('Your account was made successfully!'); 
@@ -29,44 +35,41 @@ const Register = () => {
 
 
     return (
-        <main>
-            <div className='login-card'>
-            <form onSubmit={handleSubmit}>
-                    <label className="labelHeaders">Username:
-                        <input name="username"
+        <Container>
+            <Heading>Create New Account</Heading>
+            <form onSubmit={handleSubmit}>    
+                    <Input 
                         type='text'
                         required
-                        value={username} 
-                        onChange={(e) => setUsername(e.target.value)}/>
-                    </label><br/><br/>
-                    <label className="labelHeaders">Password:
-                        <input name="password"
+                        placeholder='Username'
+                        onChange={(e) => setUsername(e.target.value)}
+                    />
+                    <Input 
+                        type='password'
+                        required
+                        placeholder='Password'
+                        onChange={(e) => setPassword(e.target.value)}
+                    />
+                    <Input
                         type='text'
                         required
-                        value={password} 
-                        onChange={(e) => setPassword(e.target.value)}/>
-                    </label><br/><br/>
-                    <label className="labelHeaders">First Name:
-                        <input name="firstname"
+                        placeholder='First Name' 
+                        onChange={(e) => setFirstName(e.target.value)}
+                    />
+                    <Input
                         type='text'
                         required
-                        value={first_name} 
-                        onChange={(e) => setFirstName(e.target.value)}/>
-                    </label><br/><br/>
-                    <label className="labelHeaders">Last Name:
-                        <input name="lastname"
-                        type='text'
-                        required
-                        value={last_name} 
-                        onChange={(e) => setLastName(e.target.value)}/>
-                    </label><br/><br/>
-                    <button className='submitButton'>Submit</button>
+                        placeholder='Last Name'
+                        onChange={(e) => setLastName(e.target.value)}
+                    />
+                    <Button>
+                        Submit
+                    </Button>
                 </form>
-            <div className='link-container'>
-                <Link to={'/'}>Already have an account? Log in here.</Link>
-            </div>
-            </div>
-        </main>
+                <Label onClick={(event) => {navigate('/login')} }>
+                    Login
+                </Label>
+        </Container>
     )
 }
 
