@@ -1,5 +1,7 @@
 import Styled from 'styled-components';
 // import useDarkMode from '../useDarkMode'
+import { ReactComponent as DarkThemeIcon } from '../../icons/dark-theme-icon.svg';
+import { ReactComponent as LightThemeIcon } from '../../icons/light-theme-icon.svg';
 
 export const colorPalette = {
   light: {
@@ -9,7 +11,8 @@ export const colorPalette = {
     secondaryText: '#FAFAFA',
     accent: '#AE8351',
     background: '#FAFAFA',
-    backgroundGradient: 'linear-gradient(#D6D9D2, #F3F3F3)'
+    backgroundGradient: 'linear-gradient(#D6D9D2, #F3F3F3)',
+    border: '#c9c9c9'
   },
   dark: {
     primary: '#33401C',
@@ -19,6 +22,7 @@ export const colorPalette = {
     accent: '#81613C',
     background: '#303030',
     backgroundGradient: 'linear-gradient(#1A1A1D, #303030)',
+    border: '#434343'
   }
 }
 //${props => props.theme.light.backgroundGradient}
@@ -40,6 +44,7 @@ export const HeaderContainer = Styled.header`
     box-shadow: 0px 0px 16px #0204;
     margin-bottom: 5vh;
     min-width: 100vw;
+    align-item: stretch;
 `;
 
 export const Container = Styled.div`
@@ -49,7 +54,7 @@ export const Container = Styled.div`
   padding: 2vw;
   width: 30vw;
   min-width: 350px;
-  border: 1px solid ${({ theme }) => theme.primary};
+  border: 1px solid ${({ theme }) => theme.border};
   justify-content: center;
 `;
 
@@ -92,7 +97,7 @@ export const NavItem = Styled.div`
   font-weight: bold;
   border-radius: 15px;
   &:hover {
-    color: ${({ theme }) => theme.accent};;
+    color: ${({ theme }) => theme.accent};
   }
 `;
 
@@ -101,6 +106,27 @@ export const Label = Styled.div`
   cursor: pointer;
   color: ${({ theme }) => theme.text};
 `
+
+export const DarkThemeButton = Styled(DarkThemeIcon)`
+  cursor: pointer;
+  height: 20px;
+  &:hover {
+    path {
+      stroke: ${({ theme }) => theme.accent};
+    }
+  }
+`;
+
+export const LightThemeButton = Styled(LightThemeIcon)`
+  cursor: pointer;
+  height: 20px;
+  &:hover {
+    path {
+      stroke: ${({ theme }) => theme.accent};
+    }
+  }
+`;
+
 // export const StyledComponent = () => {
 //   const isDarkMode = useDarkMode();
 

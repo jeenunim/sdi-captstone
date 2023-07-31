@@ -4,12 +4,13 @@ import Styled from 'styled-components'
 import AppContext from "../AppContext";
 import { NavItem } from './Utils/StyledComponents';
 import { notify } from './Utils/Toaster';
-import { HeaderContainer as Container } from './Utils/StyledComponents';
+import { HeaderContainer as Container, LightThemeButton, DarkThemeButton } from './Utils/StyledComponents';
 
 const Header = () => {
 
     const navigate = useNavigate();
     const { userId, setUserId } = useContext(AppContext);
+    const { isDarkMode, setIsDarkMode } = useContext(AppContext);
     const [ isLoggedIn, setIsLoggedIn ] = useState(false);
     
     const handleLogin = () => {
@@ -21,6 +22,10 @@ const Header = () => {
         setUserId(0);
         navigate('/login');
         notify('Logged out successfully!', 'success');
+    }
+
+    const toggleDarkMode = () => {
+        setIsDarkMode(!isDarkMode);
     }
 
     const render = () => {
@@ -36,9 +41,11 @@ const Header = () => {
                 </>
             )
         } else {
-            <NavItem onClick={handleLogin}>
-                Login
-            </NavItem>
+            return (
+                <NavItem onClick={handleLogin}>
+                    Login
+                </NavItem>
+            )
         }
     }
 
@@ -52,6 +59,7 @@ const Header = () => {
                 Home
             </NavItem>
             {render()}
+            {isDarkMode ? <LightThemeButton onClick={toggleDarkMode} /> : <DarkThemeButton onClick={toggleDarkMode} />}
         </Container>
     )
 }
