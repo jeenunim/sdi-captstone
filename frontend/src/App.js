@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Overview from "./components/Overview";
+import InfoDisplay from "./components/InfoDisplay";
 import Header from "./components/Header";
 import AppContext from "./AppContext";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import Profile from "./components/Profile";
-import Subordinates from "./components/Subordinates";
 import "./App.css";
 import { ThemeProvider } from "styled-components";
 import { colorPalette, Background } from "./components/Utils/StyledComponents";
@@ -20,7 +19,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [userId, setUserId] = useState(0);
-  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const [isDataReady, setIsDataReady] = useState(false);
 
   const getLoggedInUserId = () => {
@@ -69,26 +68,6 @@ function App() {
     }
   }, [membersList, statusList, statusTypeList, userId]);
 
-  useEffect(() => {
-    if (membersList.length > 0 && statusList.length > 0 && !isDataReady) {
-      // Merge data and set renderList
-      const mergedData = membersList.map((member) => {
-        const status = statusList.find((stat) => stat.id === member.status_id);
-        if (status) {
-          return {
-            ...member,
-            address: status.address,
-            status: status.type,
-          };
-        } else {
-          return member;
-        }
-      });
-      setRenderList(mergedData);
-      setIsDataReady(true);
-    }
-  }, [membersList, statusList, isDataReady]);
-
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -120,7 +99,7 @@ function App() {
       return <Route path="/" element={<Login />} />;
     } else {
       // We pass the `mergedList` from the `App` component as a prop to `Overview`.
-      return <Route path="/" element={<Overview mergedList={renderList} />} />;
+      return <Route path="/" element={<InfoDisplay mergedList={renderList} />} />;
     }
   };
 
@@ -136,7 +115,6 @@ function App() {
               <Route path="/signup" element={<Register />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/login" element={<Login />} />
-              <Route path="/subordinates" element={<Subordinates />}/>
 
             </Routes>
           </Router>

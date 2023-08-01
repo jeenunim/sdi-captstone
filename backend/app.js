@@ -218,7 +218,7 @@ app.get('/member/:memberId/supervisor', (req, res) => {
   })
 })
 
-app.patch('/member/:memberId/profile', (req, res) => {
+app.patch('/member/:memberId', (req, res) => {
   /** @type {number} */
   const memberId = req.params.memberId;
   /** @type {{first_name: string, last_name: string, password: string, branch_id: number, rank_id: number, office_symbol: string, org_id: number, supervisor_id: number, is_commander: boolean}}*/
@@ -292,6 +292,24 @@ app.get('/member/:memberId/rank', (req, res) => {
     .catch(err => {
       res.status(404).send(JSON.stringify({
         error: `Could not find member of id '${memberId}'s rank!`
+      }))
+    })
+})
+
+app.get('/member/:memberId/branch', (req, res) => {
+  /** @type {number} */
+  const memberId = req.params.memberId;
+
+  branchController.getMemberBranch(memberId)
+    .then(branch => {
+      res.status(200).send(JSON.stringify({
+        message: 'branch found!',
+        branch: branch
+      }))
+    })
+    .catch(err => {
+      res.status(404).send(JSON.stringify({
+        error: `Could not find member of id '${memberId}'s branch!`
       }))
     })
 })

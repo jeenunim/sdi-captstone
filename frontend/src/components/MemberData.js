@@ -15,7 +15,7 @@ const MemberData = () => {
   return (
     // <div style={{position: 'relative', left: '33%', right: "33%", height: "auto", width: "33%" }}>
     //below is the refactor for the map/user page
-    <div style={{ position: 'relative', left: '25vw', height: '20vh', width: '50vw', marginTop: '3vh' }}> 
+    <div style={{  position: 'relative', left: '25vw', height: '35vh', width: '50vw', marginTop: '3vh', overflow: 'auto' }}> 
       <Table striped bordered hover>
         <thead>
           <tr>

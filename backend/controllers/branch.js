@@ -1,4 +1,5 @@
 const knex = require('knex')(require('../knexfile.js')['development']);
+const { getMember } = require('./member');
 
 const getBranch = (branchId) => {
   return knex('branch')
@@ -38,4 +39,11 @@ const getBranches = () => {
     })
 }
 
-module.exports = { getBranch, getBranches }
+const getMemberBranch = (memberId) => {
+  return getMember(memberId)
+    .then(member => {
+      return getBranch(member.branch_id);
+    })
+}
+
+module.exports = { getBranch, getBranches, getMemberBranch}

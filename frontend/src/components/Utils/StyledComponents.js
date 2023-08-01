@@ -85,8 +85,8 @@ export const Container = Styled.div`
 `;
 
 export const Input = Styled.input`
-  margin-top: 2vh;
-  margin-bottom: 2vh;
+  margin-top: 1.5vh;
+  margin-bottom: 1.5vh;
   outline: none;
   border: none;
   padding: 1vh;
@@ -109,7 +109,7 @@ export const Button = Styled.button`
   margin-top: 2vh;
   margin-bottom: 2vh;
   &:hover {
-    background-color: ##546a26;
+    background-color: #546a26;
   }
   min-height: 40px;
   width: 100%;
@@ -200,6 +200,7 @@ export const Field = (props) => {
     display: grid;
     grid-template-columns: 1fr 1fr;
     margin: 5px;
+    align-items: center;
   `;
 
   const FieldName = Styled.div`
@@ -218,7 +219,65 @@ export const Field = (props) => {
   return (
     <Wrapper>
       <FieldName>{name}:</FieldName>
-      <FieldData>{data? data : 'undefined'}</FieldData>
+      <FieldData>{data? data : 'None'}</FieldData>
     </Wrapper>
+  )
+}
+
+export const Select = (props) => {
+  const { optionsData, placeholder, defaultValue, onChange } = props;
+
+  const StyledSelect = Styled.select`
+    margin-top: 1.5vh;
+    margin-bottom: 1.5vh;
+    color: ${({ theme }) => theme.text};
+    background-color: ${({ theme }) => theme.background};
+    border-radius: 5px;
+    border: 1px solid ${({ theme }) => theme.border};
+  `;
+
+  const Option = Styled.option`
+    color: ${({ theme }) => theme.text};
+    background-color: ${({ theme }) => theme.background};
+  `;
+
+  const options = optionsData.map(optionData => {
+    if (defaultValue === optionData) {
+      return (
+        <Option key={optionData} value={optionData} selected>
+          {optionData}
+        </Option>
+      )
+    }
+    return (
+      <Option key={optionData} value={optionData}>
+        {optionData}
+      </Option>
+    )
+  });
+
+  const render = () => {
+    if (defaultValue) {
+      return (
+        <>
+          <option value='' disabled>{placeholder}</option>
+          {options}
+        </>
+      );
+    } else {
+      
+      return (
+        <>
+          <option value='' disabled selected>{placeholder}</option>
+          {options}
+        </>
+      );
+    }
+  }
+
+  return (
+    <StyledSelect onChange={onChange}>
+      {render()}
+    </StyledSelect>
   )
 }

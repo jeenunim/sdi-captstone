@@ -30,9 +30,6 @@ const Header = () => {
                     <NavItem onClick={handleLogout}>
                         Logout
                     </NavItem>
-                    <NavItem onClick={()=> navigate('/subordinates')}>
-                        TESTING SUBORDINATES    
-                    </NavItem>
                 </>
             )
         } else {
