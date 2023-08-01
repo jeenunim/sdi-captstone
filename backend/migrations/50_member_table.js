@@ -9,9 +9,9 @@ exports.up = function(knex) {
         table.string('last_name').notNullable();
         table.string('username').notNullable();
         table.string('password').notNullable();
-        table.integer('branch_id');
+        table.integer('branch_id').notNullable().defaultTo(5);
         table.foreign('branch_id').references('branch.id')
-        table.integer('rank_id');
+        table.integer('rank_id').notNullable().defaultTo(1);
         table.foreign('rank_id').references('rank.id');
         table.string('office_symbol');
         table.integer('org_id');

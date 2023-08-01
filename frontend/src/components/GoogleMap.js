@@ -133,9 +133,8 @@ export default function GoogleMap() {
 
       {selectedMember && (
         <div className="modal" style={{ display: "block", position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0, 0, 0, 0.5)", zIndex: 999 }}>
-          <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", background: "#fff", padding: "20px", borderRadius: "5px", maxWidth: "500px" }}>
-            <MemberInfo memberId={selectedMember.id} />
-            {/* <button onClick={() => setSelectedMember(null)}></button> */}
+          <div style={{ position: "relative", top: "50%", left: "50%", transform: "translate(-50%, -50%)", background: "none", padding: "0px", maxWidth: "500px" }}>
+            <MemberInfo memberId={selectedMember.id} closeModal={() => setSelectedMember(null)} />
           </div>
         </div>
       )}

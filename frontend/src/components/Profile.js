@@ -22,9 +22,6 @@ const Profile = () => {
   const [ status, setStatus ] = useState();
   const [ supervisor, setSupervisor ] = useState();
 
-  const [ modifiedMember, setModifiedMember ] = useState(member);
-  const [ modifiedStatus, setModifiedStatus ] = useState(status);
-
   const [ branches, setBranches ] = useState();
   const [ ranks, setRanks ] = useState();
   const [ statusTypes, setStatusTypes ] = useState();
@@ -117,21 +114,11 @@ const Profile = () => {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-            first_name: modifiedMember.first_name,
-            last_name: modifiedMember.last_name,
-            branch_id: modifiedMember.branch_id,
-            rank_id: modifiedMember.rank_id,
+            first_name: member.first_name,
+            last_name: member.last_name,
+            branch_id: member.branch_id,
+            rank_id: member.rank_id,
         })
-      })
-      .then(res => res.json())
-      .then(data => {
-        console.log(data);
-        return data;
-      })
-      .catch(err => {
-        console.error(err);
-        notify(err, 'error');
-        throw err;
       }),
     // ToDo: fetch patch /member/:memberId/supervisor
     fetch(`http://localhost:8080/member/${userId}/supervisor`, {
@@ -139,18 +126,8 @@ const Profile = () => {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-            supervisor_id: modifiedMember.supervisor_id
+            supervisor_id: member.supervisor_id
         })
-      })
-      .then(res => res.json())
-      .then(data => {
-        console.log(data);
-        return data;
-      })
-      .catch(err => {
-        console.error(err);
-        notify(err, 'error');
-        throw err;
       }),
     // ToDo: fetch patch /member/:memberId/status
     fetch(`http://localhost:8080/member/${userId}/status`, {
@@ -158,25 +135,22 @@ const Profile = () => {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-            status: modifiedStatus
+            status: {
+              status_type_id: status.status_type_id,
+              description: status.description,
+              address: status.address
+            }
         })
-      })
-      .then(res => res.json())
-      .then(data => {
-        console.log(data);
-        return data;
-      })
-      .catch(err => {
-        console.error(err);
-        notify(err, 'error');
-        throw err;
       })
     ])
     .then(data => {
+      console.log(data);
       notify('Data successfully updated!', 'success');
+      toggleEditMode();
     })
     .catch(err => {
       console.error(err);
+      notify('Failed to update...', 'error');
     })
   }
 
@@ -202,14 +176,14 @@ const Profile = () => {
                 placeholder='Select Supervisor...' 
                 defaultValue= {`${supervisor?.first_name} ${supervisor?.last_name}`}
                 optionsData={members?.map(member => `${member.first_name} ${member.last_name}`)} 
-                onChange={(event) => {
+                onBlur={(event) => {
                   const supervisorFullName = event.target.value;
                   const supervisorFound = members.find(member => `${member.first_name} ${member.last_name}` === supervisorFullName);
                   const supervisorId = supervisorFound?.id;
                   const { supervisor_id, ...updatedMember } = member;
 
                   updatedMember.supervisor_id = supervisorId;
-                  setModifiedMember(updatedMember)
+                  setMember(updatedMember)
                 }}
               />
             } 
@@ -222,12 +196,12 @@ const Profile = () => {
               <Input 
                 placeholder='First Name'
                 defaultValue={member?.first_name}
-                onChange={(event) => {
+                onBlur={(event) => {
                   const firstName = event.target.value;
                   const { first_name, ...updatedMember } = member;
 
                   updatedMember.first_name = firstName;
-                  setModifiedMember(updatedMember);
+                  setMember(updatedMember);
                 }}
               />
             } 
@@ -238,12 +212,12 @@ const Profile = () => {
               <Input 
                 placeholder='Last Name'
                 defaultValue={member?.last_name}
-                onChange={(event) => {
+                onBlur={(event) => {
                   const lastName = event.target.value;
                   const { last_name, ...updatedMember } = member;
 
                   updatedMember.last_name = lastName;
-                  setModifiedMember(updatedMember);
+                  setMember(updatedMember);
                 }}
               />
             } 
@@ -255,14 +229,14 @@ const Profile = () => {
                 defaultValue={branch?.name}
                 placeholder='Select Military Branch...' 
                 optionsData={branches?.map(branch => branch.name)}
-                onChange={(event) => {
+                onBlur={(event) => {
                   const branchName = event.target.value;
                   const branchFound = branches?.find(branch => branch.name === branchName);
                   const branchId = branchFound?.id;
                   const { branch_id, ...updatedMember } = member;
 
                   updatedMember.branch_id = branchId;
-                  setModifiedMember(updatedMember);
+                  setMember(updatedMember);
                 }}
               />
             } 
@@ -274,14 +248,14 @@ const Profile = () => {
                 defaultValue={rank?.title}
                 placeholder='Select Rank...' 
                 optionsData={ranks?.map(rank => rank.title)} 
-                onChange={(event) => {
+                onBlur={(event) => {
                   const rankTitle = event.target.value;
                   const rankFound = ranks?.find(rank => rank.title === rankTitle);
                   const rankId = rankFound?.id;
                   const { rank_id, ...updatedMember } = member;
 
                   updatedMember.rank_id = rankId;
-                  setModifiedMember(updatedMember);
+                  setMember(updatedMember);
                 }}
               />
             } 
@@ -292,17 +266,17 @@ const Profile = () => {
             name='Type' 
             data={
               <Select 
-                defaultValue={status?.name}
+                defaultValue={status?.type}
                 placeholder='Select Status Type...' 
                 optionsData={statusTypes?.map(status => status.name)}
-                onChange={(event) => {
+                onBlur={(event) => {
                   const statusTypeName = event.target.value;
                   const statusTypeFound = statusTypes.find(statusType => statusType.name === statusTypeName);
                   const statusTypeId = statusTypeFound?.id;
                   const { status_type_id, ...updatedStatus } = status;
                   
                   updatedStatus.status_type_id = statusTypeId;
-                  setModifiedStatus(updatedStatus);
+                  setStatus(updatedStatus);
                 }}
               />
             } 
@@ -313,12 +287,12 @@ const Profile = () => {
               <Input 
                 placeholder='Address'
                 defaultValue={status?.address}
-                onChange={(event) => {
+                onBlur={(event) => {
                   const statusAddress = event.target.value;
                   const { address, ...updatedStatus } = status;
                   
                   updatedStatus.address = statusAddress;
-                  setModifiedStatus(updatedStatus);
+                  setStatus(updatedStatus);
                 }}
               />
             }
@@ -329,12 +303,12 @@ const Profile = () => {
               <Input 
                 placeholder='Description'
                 defaultValue={status?.description}
-                onChange={(event) => {
+                onBlur={(event) => {
                   const statusDescription = event.target.value;
                   const { description, ...updatedStatus } = status;
                   
                   updatedStatus.description = statusDescription;
-                  setModifiedStatus(updatedStatus);
+                  setStatus(updatedStatus);
                 }}
               />
             } 
@@ -368,31 +342,6 @@ const Profile = () => {
     }
   }
 
-  // function getCookie(name) {
-  //     const cookieString = document.cookie;
-  //     const cookies = cookieString.split("; ");
-    
-  //     for (let i = 0; i < cookies.length; i++) {
-  //       const cookie = cookies[i].split("=");
-  //       if (cookie[0] === name) {
-  //         return decodeURIComponent(cookie[1]);
-  //       }
-  //     }
-    
-  //     return null;
-  //   }
-
-  //     // const currentUserData = mergedList.find((obj) => obj.id === currentUserId);
-  //     // console.log(currentUserData)
-
-  // const currentUserData = renderList.find(e => e.id == getCookie('memberId'))
-  // console.log("current user data: ", currentUserData)
-  // // console.log("rank: ", rank.title)
-
-
-  // if (!renderList || renderList.length === 0) {
-  //   return <div>No member data available.</div>;
-  // }
   return (
     <Container>
       {render()}

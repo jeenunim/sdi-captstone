@@ -262,7 +262,7 @@ app.patch('/member/:memberId/status', (req, res) => {
   /** @type {number} */
   const memberId = req.params.memberId;
   /** @type {{status_type_id:number, address:string, description:string}} */
-  const status = req.body;
+  const status = req.body.status;
 
   statusController.updateMemberStatus(memberId, status)
   .then(status => {

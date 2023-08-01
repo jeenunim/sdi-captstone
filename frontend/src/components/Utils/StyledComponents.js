@@ -225,7 +225,7 @@ export const Field = (props) => {
 }
 
 export const Select = (props) => {
-  const { optionsData, placeholder, defaultValue, onChange } = props;
+  const { optionsData, placeholder, defaultValue, onBlur } = props;
 
   const StyledSelect = Styled.select`
     margin-top: 1.5vh;
@@ -276,7 +276,7 @@ export const Select = (props) => {
   }
 
   return (
-    <StyledSelect onChange={onChange}>
+    <StyledSelect onBlur={onBlur}>
       {render()}
     </StyledSelect>
   )

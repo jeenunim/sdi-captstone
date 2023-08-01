@@ -20,6 +20,7 @@ const getMemberStatus = (memberId) => {
               const { name, ...status } = statusFound;
               status.type = name;
               status.member_id = memberId;
+              status.status_type_id = statusId;
               return status;
             } 
           } 
@@ -92,7 +93,11 @@ const updateMemberStatus = (memberId, status) => {
       if (statusId) {
         return knex('status')
           .where('id', statusId)
-          .update(status, ['*'])
+          .update({
+            status_type_id: status.status_type_id,
+            address: status.address,
+            description: status.description
+          }, ['*'])
           .then(statuses => {
             const statusFound = statuses.length > 0;
             if (statusFound) {
