@@ -8,6 +8,9 @@ const memberController = require('./controllers/member.js');
 const membersController = require('./controllers/members.js');
 const statusController = require('./controllers/status.js');
 const authenticationController = require('./controllers/authentication.js');
+const orgController = require('./controllers/organization.js');
+const rankController = require('./controllers/rank.js');
+const branchController = require('./controllers/branch.js');
 
 const corsOptions = {
   origin: 'http://localhost:3000',
@@ -279,7 +282,7 @@ app.get('/member/:memberId/rank', (req, res) => {
   /** @type {number} */
   const memberId = req.params.memberId;
 
-  memberController.getMemberRank(memberId)
+  rankController.getMemberRank(memberId)
     .then(rank => {
       res.status(200).send(JSON.stringify({
         message: 'Rank found!',
@@ -304,6 +307,118 @@ app.get('/status_types', (req, res) => {
     .catch(err => {
       res.status(404).send(JSON.stringify({
         error: `Could not find status types!`
+      }))
+    })
+})
+
+app.get('/organizations', (req, res) => {
+  orgController.getOrganizations()
+    .then(organizations => {
+      res.status(200).send(JSON.stringify({
+        message: 'Organizations found!',
+        organizations: organizations
+      }))
+    })
+    .catch(err => {
+      res.status(404).send(JSON.stringify({
+        error: err.message
+      }))
+    })
+})
+
+app.get('/organization/:orgId', (req, res) => {
+  /** @type {number} */
+  const orgId = req.params.orgId;
+
+  orgController.getOrganization(orgId)
+    .then(organization => {
+      res.status(200).send(JSON.stringify({
+        message: 'Organization found!',
+        organization: organization
+      }))
+    })
+    .catch(err => {
+      res.status(404).send(JSON.stringify({
+        error: err.message
+      }))
+    })
+})
+
+app.get('/organization/:orgId/members', (req, res) => {
+  /** @type {number} */
+  const orgId = req.params.orgId;
+
+  orgController.getMembersByOrganization(orgId)
+    .then(members => {
+      res.status(200).send(JSON.stringify({
+        message: 'Members found!',
+        members: members
+      }))
+    })
+    .catch(err => {
+      res.status(404).send(JSON.stringify({
+        error: err.message
+      }))
+    })
+})
+
+app.get('/ranks', (req, res) => {
+  rankController.getRanks()
+    .then(ranks => {
+      res.status(200).send(JSON.stringify({
+        message: 'Ranks found!',
+        ranks: ranks
+      }))
+    })
+    .catch(err => {
+      res.status(404).send(JSON.stringify({
+        error: err.message
+      }))
+    })
+})
+
+app.get('/branches', (req, res) => {
+  branchController.getBranches()
+    .then(branches => {
+      res.status(200).send(JSON.stringify({
+        message: 'Branches found!',
+        branches: branches
+      }))
+    })
+    .catch(err => {
+      res.status(404).send(JSON.stringify({
+        error: err.message
+      }))
+    })
+})
+
+app.get('/branch/:branchId', (req, res) => {
+  /** @type {number} */
+  const branchId = req.params.branchId;
+
+  branchController.getBranch(branchId)
+    .then(branch => {
+      res.status(200).send(JSON.stringify({
+        message: 'Branch found!',
+        branch: branch
+      }))
+    })
+})
+
+app.get('/branch/:branchId/ranks', (req, res) => {
+  /** @type {number} */
+  const branchId = req.params.branchId;
+
+  rankController.getRanksByMilitaryBranch(branchId)
+    .then(ranks => {
+      res.status(200).send(JSON.stringify({
+        message: 'Ranks found!',
+        ranks: ranks
+      }))
+    })
+    .catch(err => {
+      res.status(404).send(JSON.stringify({
+        error: err.message
       }))
     })
 })

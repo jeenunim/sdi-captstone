@@ -12,6 +12,16 @@ exports.seed = async function(knex) {
     },
     {
       name: 'Space Systems Command'
+    },
+    {
+      name: 'United Nations Space Command'
+    },
+    {
+      name: 'National Aeronautical and Space Administration'
+    },
+    {
+      name: 'Starfleet',
+      commander_id: 6
     }
   ])
 };

@@ -97,33 +97,6 @@ const getMemberSupervisor = (memberId) => {
 }
 
 /**
- * @param {number} memberId Expects member.id
- * @returns {Promise<member.status | Error>} Returns a promisifed member's status
- */
-const getMemberRank = (memberId) => {
-  return getMember(memberId)
-    .then(member => {
-      return knex('rank')
-        .join('branch', 'rank.branch_id', 'branch.id')
-        .select('rank.id', 'rank.pay_grade', 'rank.title', 'rank.abbreviation', 'branch.name')
-        .then(ranks => {
-          const rankId = member.rank_id;
-          const { name, ...rank } = ranks.find(rank => rank.id === rankId);
-          if (rank) {
-            rank.branch = name;
-            return rank;
-          } else {
-            throw new Error(`Could not find member of id '${memberId}'s rank!`);
-          }
-        })
-        .catch(err => {
-          console.error(err.message);
-          throw err;
-        })
-      })
-}
-
-/**
  * @param {number} memberId 
  * @param {{
     * first_name: string, 
@@ -161,4 +134,4 @@ const updateMemberProfile = (memberId, profile) => {
     })
 }
 
-module.exports = { getMember, getMemberSubordinates, getMemberSupervisor, updateMemberSupervisor, getMemberRank, updateMemberProfile }
+module.exports = { getMember, getMemberSubordinates, getMemberSupervisor, updateMemberSupervisor, updateMemberProfile }
