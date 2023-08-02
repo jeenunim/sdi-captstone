@@ -17,6 +17,7 @@ exports.seed = async function(knex) {
       office_symbol: 'SF/OCSO', 
       org_id: 1,
       status_id: 1, 
+      supervisor_id: 1,
       is_supervisor: true, 
       is_commander: true 
     },

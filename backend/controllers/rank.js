@@ -61,6 +61,7 @@ const getRanks = () => {
     .select('*')
     .join('branch', 'branch.id', 'rank.branch_id')
     .then(joinedRanks => {
+      console.log(joinedRanks);
       const ranks = joinedRanks.map(({name, ...rank}) => {
         rank.branch = name;
         return rank;

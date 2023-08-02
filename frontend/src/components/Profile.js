@@ -135,7 +135,8 @@ const Profile = () => {
       })
       .catch(err => console.error(err));
 
-    fetch(`http://localhost:8080/member/${userId}/supervisor`, {
+    if (member.supervisor_id) {
+      fetch(`http://localhost:8080/member/${userId}/supervisor`, {
       credentials: 'include',
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -149,7 +150,7 @@ const Profile = () => {
       setSupervisor(data.supervisor);
     })
     .catch(err => console.error(err));
-
+    }
     // ToDo: feth patch /member/:memberId
     fetch(`http://localhost:8080/member/${userId}`, {
         credentials: 'include',
@@ -272,6 +273,7 @@ const Profile = () => {
                 optionsData={ranks?.map(rank => rank.title)} 
                 required
                 onBlur={(event) => {
+                  console.log('ranks', ranks)
                   const rankTitle = event.target.value;
                   const rankFound = ranks?.find(rank => rank.title === rankTitle);
                   const rankId = rankFound?.id;
