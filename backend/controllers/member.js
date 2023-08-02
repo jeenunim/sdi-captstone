@@ -70,7 +70,7 @@ const updateMemberSupervisor = (memberId, supervisorId) => {
                 knex('member')
                   .where('id', supervisorId)
                   .update({is_supervisor: true})
-                return member;
+                return supervisor;
               } else {
                 throw new Error(`Failed to updated member of id '${memberId}'s supervisor!`)
               }
@@ -111,6 +111,7 @@ const getMemberSupervisor = (memberId) => {
  * }} profile 
  */
 const updateMemberProfile = (memberId, profile) => {
+  console.log('profile:', profile);
   return getMember(memberId)
     .then(member => {
       return knex('member')
@@ -119,12 +120,12 @@ const updateMemberProfile = (memberId, profile) => {
         .then(members => {
           const memberFound = members.length > 0;
           if (memberFound) {
-            const { password, ...member } = members[0];
-            if ('supervisor_id' in member) {
-              return updateMemberSupervisor(memberId, member.supervisor_id)
-                .then(() => member)
+            const { password, ...updatedMember } = members[0];
+            console.log(updatedMember);
+            if ('supervisor_id' in updatedMember) {
+              updateMemberSupervisor(memberId, updatedMember.supervisor_id)
             }
-            return member;
+            return updatedMember;
           }
         })
         .catch(err => {

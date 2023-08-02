@@ -1,4 +1,5 @@
-import Styled from 'styled-components';
+import Styled, { createGlobalStyle } from 'styled-components';
+import { Chart } from 'react-google-charts';
 import { useState } from 'react';
 import { ReactComponent as DarkThemeIcon } from '../../icons/dark-theme-icon.svg';
 import { ReactComponent as LightThemeIcon } from '../../icons/light-theme-icon.svg';
@@ -12,10 +13,11 @@ export const colorPalette = {
     secondary: '#1A1A1D',
     text: '#303030',
     secondaryText: '#FAFAFA',
-    accent: '#81613C',
+    accent: '#a37a49',
     background: '#FAFAFA',
     backgroundGradient: 'linear-gradient(#D6D9D2, #F3F3F3)',
-    border: '#c9c9c9'
+    border: '#c9c9c9',
+    bodyBackground: '#F3F3F3'
   },
   dark: {
     primary: '#45532D',
@@ -25,12 +27,19 @@ export const colorPalette = {
     accent: '#E8A354',
     background: '#303030',
     backgroundGradient: 'linear-gradient(#1A1A1D, #303030)',
-    border: '#434343'
+    border: '#434343',
+    bodyBackground: '#303030'
   }
 }
-//${props => props.theme.light.backgroundGradient}
+
+export const GlobalStyle = createGlobalStyle`
+  body {
+    background: ${({ theme }) => theme.backgroundGradient};
+    background-attachment: fixed;
+  }
+`
+
 export const Background = Styled.div`
-  background: ${({ theme }) => theme.backgroundGradient};
   width: 100vw;
   height: 100vh;
   display: flex;
@@ -39,15 +48,15 @@ export const Background = Styled.div`
 `;
 
 export const HeaderContainer = Styled.header`
-    background-color: ${({ theme }) => theme.background};    
-    color: ${({ theme }) => theme.text};
-    flex-direction: row;
-    align-items: center;
-    height: 60px;
-    box-shadow: 0px 0px 16px #0204;
-    margin-bottom: 5vh;
-    min-width: 100vw;
-    align-item: stretch;
+  background-color: ${({ theme }) => theme.background};    
+  color: ${({ theme }) => theme.text};
+  flex-direction: row;
+  align-items: center;
+  height: 60px;
+  box-shadow: 0px 0px 16px #0204;
+  margin-bottom: 5vh;
+  min-width: 100vw;
+  align-item: stretch;
 `;
 
 export const Divider = Styled.div`
@@ -82,6 +91,8 @@ export const Container = Styled.div`
   border: 1px solid ${({ theme }) => theme.border};
   justify-content: center;
   border-radius: 5px;
+  margin: 1vw;
+  box-shadow: 0px 0px 10px #0202;
 `;
 
 export const Input = Styled.input`
@@ -94,7 +105,7 @@ export const Input = Styled.input`
   min-height: 30px;
   width: 100%;
   color: ${({ theme }) => theme.text};
-  background-color: transparent;
+  background-color: ${({ theme }) => theme.background};
 `;
 
 export const Button = Styled.button`
@@ -224,8 +235,58 @@ export const Field = (props) => {
   )
 }
 
-export const Select = (props) => {
-  const { optionsData, placeholder, defaultValue, onBlur } = props;
+export const Table = ({ headers, rows }) => {
+  const StyledTable = Styled.table`
+    border: none;
+  `
+
+  const StyledTableHeader = Styled.th`
+    color: ${colorPalette.light.secondaryText};
+    background-color: ${({ theme }) => theme.primary};
+    letter-spacing: 0.5px;
+    padding: 10px;
+    &:hover {
+      cursor: default;
+    }
+  `;
+
+  const StyledTableRow = Styled.tr`
+    &:nth-child(even) {
+      background-color: ${({ theme }) => theme.text}10;
+    };
+    &:hover {
+      background-color: ${({ theme }) => theme.accent}C0;
+      cursor:pointer;
+      td {
+        color: ${colorPalette.light.secondaryText};
+      }
+    };
+  `;
+
+  const StyledTableData = Styled.td`
+    color: ${({ theme }) => theme.text};
+    padding: 5px;
+  `;
+
+  return (
+    <StyledTable>
+      <StyledTableRow>
+        {headers.map(header => <StyledTableHeader>{header}</StyledTableHeader>)}
+      </StyledTableRow>
+      {
+        rows.map(row => {
+          return (
+            <StyledTableRow>
+              {row.map(column => <StyledTableData>{column}</StyledTableData>)}
+            </StyledTableRow>
+          )
+        })
+      }
+    </StyledTable>
+  )
+}
+
+export const Select = ({ optionsData, placeholder, defaultValue, onBlur }) => {
 
   const StyledSelect = Styled.select`
     margin-top: 1.5vh;
@@ -242,13 +303,6 @@ export const Select = (props) => {
   `;
 
   const options = optionsData.map(optionData => {
-    if (defaultValue === optionData) {
-      return (
-        <Option key={optionData} value={optionData} selected>
-          {optionData}
-        </Option>
-      )
-    }
     return (
       <Option key={optionData} value={optionData}>
         {optionData}
@@ -256,28 +310,39 @@ export const Select = (props) => {
     )
   });
 
-  const render = () => {
-    if (defaultValue) {
-      return (
-        <>
-          <option value='' disabled>{placeholder}</option>
-          {options}
-        </>
-      );
-    } else {
-      
-      return (
-        <>
-          <option value='' disabled selected>{placeholder}</option>
-          {options}
-        </>
-      );
-    }
-  }
-
   return (
-    <StyledSelect onBlur={onBlur}>
-      {render()}
+    <StyledSelect onBlur={onBlur} defaultValue={defaultValue}>
+      {options}
     </StyledSelect>
+  )
+}
+
+export const PieChart = ({ data }) => {
+  return (
+    <Chart 
+      chartType='PieChart'
+      data={data}
+      width='100%'
+      options={{
+        // pieHole: 0.5,
+        pieSliceText: "label",
+        is3D: false,
+        height: '100%',
+     
+        backgroundColor: 'transparent',
+        pieSliceText: 'none',
+        slices: {
+          0: {color: '#c62f2f'},
+          1: {color: '#74542f'},
+          2: {color: '#00d3ae'},
+          3: {color: '#8c18c2'},
+          4: {color: '#199309'}
+        },
+        legend: {textStyle: {
+          color: '#767676',
+        }},
+       pieSliceBorderColor: '#76767'
+      }}
+    />
   )
 }

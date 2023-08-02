@@ -186,10 +186,10 @@ app.patch('/member/:memberId/supervisor', (req, res) => {
   const supervisorId = req.body.supervisor_id;
 
   memberController.updateMemberSupervisor(memberId, supervisorId)
-    .then(member => {
+    .then(supervisor => {
       res.status(200).send(JSON.stringify({
         message: 'Successfully updated supervisor!',
-        member: member
+        supervisor: supervisor
       }));
     })
     .catch(err => {

@@ -18,7 +18,7 @@ export const notify = (message, type, position='top-center') => {
   if (type === undefined) {
     toast(message, settings);
   } else if (type === 'error') {
-    toast.error('stinky', settings); //is stinky
+    toast.error('Invalid Login', settings); //is stinky
   } else if (type === 'success') {
     toast.success(message, settings);
   }

@@ -62,12 +62,6 @@ exports.seed = async function(knex) {
           branch_id: 5
         },
         {
-          pay_grade: 'E-9',
-          title: 'Chief Master Sergeant of the Space Force',
-          abbreviation: 'CMSSF',
-          branch_id: 5
-        },
-        {
           pay_grade: 'O-1',
           title: 'Second Lieutenant',
           abbreviation: '2d Lt',

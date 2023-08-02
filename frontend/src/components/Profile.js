@@ -12,7 +12,7 @@ const ButtonMenu = Styled.div`
 
 const Profile = () => {
 
-  const { userId } = useContext(AppContext);
+  const { userId, setMembersList } = useContext(AppContext);
 
   const [ isEditMode, setIsEditMode ] = useState(false);
 
@@ -107,29 +107,15 @@ const Profile = () => {
     }
   }, []);
 
+  // useEffect(()=>{
+  //   fetch('http://localhost:8080/members')
+  //   .then(res => res.json())
+  //   .then(data => {
+  //     setMembersList(data.members);
+  //   })
+  // }, [member]);
+
   const handleSaveChanges = () => {
-    // ToDo: feth patch /member/:memberId
-    Promise.all([(`http://localhost:8080/member/${userId}`, {
-        credentials: 'include',
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            first_name: member.first_name,
-            last_name: member.last_name,
-            branch_id: member.branch_id,
-            rank_id: member.rank_id,
-        })
-      }),
-    // ToDo: fetch patch /member/:memberId/supervisor
-    fetch(`http://localhost:8080/member/${userId}/supervisor`, {
-        credentials: 'include',
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            supervisor_id: member.supervisor_id
-        })
-      }),
-    // ToDo: fetch patch /member/:memberId/status
     fetch(`http://localhost:8080/member/${userId}/status`, {
         credentials: 'include',
         method: 'PATCH',
@@ -142,16 +128,48 @@ const Profile = () => {
             }
         })
       })
-    ])
+      .then(res => res.json())
+      .then(data => {
+        console.log(data);
+        setStatus(data.status);
+      })
+      .catch(err => console.error(err));
+
+    fetch(`http://localhost:8080/member/${userId}/supervisor`, {
+      credentials: 'include',
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+          supervisor_id: member.supervisor_id
+      })
+    })
+    .then(res => res.json())
     .then(data => {
       console.log(data);
-      notify('Data successfully updated!', 'success');
+      setSupervisor(data.supervisor);
+    })
+    .catch(err => console.error(err));
+
+    // ToDo: feth patch /member/:memberId
+    fetch(`http://localhost:8080/member/${userId}`, {
+        credentials: 'include',
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            first_name: member.first_name,
+            last_name: member.last_name,
+            branch_id: branch.id,
+            rank_id: rank.id
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        console.log(data);
+        setMember(data.member);
+      })
+      .catch(err => console.error(err));
+    
       toggleEditMode();
-    })
-    .catch(err => {
-      console.error(err);
-      notify('Failed to update...', 'error');
-    })
   }
 
   const toggleEditMode = () => setIsEditMode(!isEditMode);
@@ -174,14 +192,14 @@ const Profile = () => {
             data={
               <Select  
                 placeholder='Select Supervisor...' 
-                defaultValue= {`${supervisor?.first_name} ${supervisor?.last_name}`}
-                optionsData={members?.map(member => `${member.first_name} ${member.last_name}`)} 
+                optionsData={members?.map(member => `${member.first_name} ${member.last_name}`)}
+                defaultValue= {`${members?.find(mem => mem.id === member?.supervisor_id)?.first_name} ${members?.find(mem => mem.id === member?.supervisor_id)?.last_name}`}
                 onBlur={(event) => {
                   const supervisorFullName = event.target.value;
-                  const supervisorFound = members.find(member => `${member.first_name} ${member.last_name}` === supervisorFullName);
+                  const supervisorFound =  members.find(mem => `${mem.first_name} ${mem.last_name}` == supervisorFullName);
                   const supervisorId = supervisorFound?.id;
                   const { supervisor_id, ...updatedMember } = member;
-
+                  
                   updatedMember.supervisor_id = supervisorId;
                   setMember(updatedMember)
                 }}
@@ -196,6 +214,7 @@ const Profile = () => {
               <Input 
                 placeholder='First Name'
                 defaultValue={member?.first_name}
+                required
                 onBlur={(event) => {
                   const firstName = event.target.value;
                   const { first_name, ...updatedMember } = member;
@@ -212,6 +231,7 @@ const Profile = () => {
               <Input 
                 placeholder='Last Name'
                 defaultValue={member?.last_name}
+                required
                 onBlur={(event) => {
                   const lastName = event.target.value;
                   const { last_name, ...updatedMember } = member;
@@ -226,9 +246,10 @@ const Profile = () => {
             name='Branch' 
             data={
               <Select 
-                defaultValue={branch?.name}
+                defaultValue={branches?.find(branch => branch.id === member.branch_id)?.name}
                 placeholder='Select Military Branch...' 
                 optionsData={branches?.map(branch => branch.name)}
+                required
                 onBlur={(event) => {
                   const branchName = event.target.value;
                   const branchFound = branches?.find(branch => branch.name === branchName);
@@ -237,6 +258,7 @@ const Profile = () => {
 
                   updatedMember.branch_id = branchId;
                   setMember(updatedMember);
+                  setBranch(branchFound);
                 }}
               />
             } 
@@ -248,6 +270,7 @@ const Profile = () => {
                 defaultValue={rank?.title}
                 placeholder='Select Rank...' 
                 optionsData={ranks?.map(rank => rank.title)} 
+                required
                 onBlur={(event) => {
                   const rankTitle = event.target.value;
                   const rankFound = ranks?.find(rank => rank.title === rankTitle);
@@ -256,6 +279,7 @@ const Profile = () => {
 
                   updatedMember.rank_id = rankId;
                   setMember(updatedMember);
+                  setRank(rankFound);
                 }}
               />
             } 
@@ -266,16 +290,18 @@ const Profile = () => {
             name='Type' 
             data={
               <Select 
-                defaultValue={status?.type}
+                defaultValue={statusTypes?.find(statusType => statusType.id == status?.status_type_id)?.name}
                 placeholder='Select Status Type...' 
-                optionsData={statusTypes?.map(status => status.name)}
+                optionsData={statusTypes?.map(statusType => statusType.name)}
+                required
                 onBlur={(event) => {
                   const statusTypeName = event.target.value;
-                  const statusTypeFound = statusTypes.find(statusType => statusType.name === statusTypeName);
+                  const statusTypeFound = statusTypes?.find(statusType => statusType.name == statusTypeName);
                   const statusTypeId = statusTypeFound?.id;
                   const { status_type_id, ...updatedStatus } = status;
                   
                   updatedStatus.status_type_id = statusTypeId;
+
                   setStatus(updatedStatus);
                 }}
               />
@@ -287,6 +313,7 @@ const Profile = () => {
               <Input 
                 placeholder='Address'
                 defaultValue={status?.address}
+                required
                 onBlur={(event) => {
                   const statusAddress = event.target.value;
                   const { address, ...updatedStatus } = status;
@@ -303,6 +330,7 @@ const Profile = () => {
               <Input 
                 placeholder='Description'
                 defaultValue={status?.description}
+                required
                 onBlur={(event) => {
                   const statusDescription = event.target.value;
                   const { description, ...updatedStatus } = status;
@@ -343,7 +371,7 @@ const Profile = () => {
   }
 
   return (
-    <Container>
+    <Container style={{minWidth: '40vw'}}>
       {render()}
   </Container>
   );

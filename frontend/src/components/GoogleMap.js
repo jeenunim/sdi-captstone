@@ -14,13 +14,14 @@ export default function GoogleMap() {
   const { renderList } = useContext(AppContext);
   const [selectedMember, setSelectedMember] = useState(null);
 
-  const codeAddress = (address, member) => {
+  const codeAddress = (address, members) => {
     // Check if the geocoder and mapRef are available
     if (!window.google || !window.google.maps || !mapRef.current) {
       return;
     }
 
     const geocoder = new window.google.maps.Geocoder();
+
 
     geocoder.geocode({ address }, function (results, status) {
       if (status === window.google.maps.GeocoderStatus.OK) {
@@ -37,13 +38,14 @@ export default function GoogleMap() {
           markers.current[markerIndex].marker.setPosition(updatedCenter);
         } else {
           let image;
+          const member = members[0];
           member.status ? (image = `/${member.status}Marker.png`) : (image = '/PresentMarker.png');
           const name = `${member.first_name} ${member.last_name}`
           // If marker doesn't exist, create a new marker
           const newMarker = new window.google.maps.Marker({
             map: mapRef.current,
             position: updatedCenter,
-            title: name,
+            title: name + (", "),
             icon: image,
           });
 
@@ -102,12 +104,21 @@ export default function GoogleMap() {
     });
     markers.current = [];
 
+    const locationMap = new Map();
+
     renderList.forEach((member) => {
       const location = member.address;
       if (location) {
-        codeAddress(location, member);
+        if (locationMap.has(location)) {
+          locationMap.get(location).push(member);
+        } else {
+          locationMap.set(location, [member]);
+        }
       }
     });
+    locationMap.forEach((members, location) => {
+      codeAddress(location, members);
+    })
   };
 
   // Check if there was an error loading the Google Maps API

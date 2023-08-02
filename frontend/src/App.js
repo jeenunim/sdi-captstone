@@ -10,6 +10,7 @@ import "./App.css";
 import { ThemeProvider } from "styled-components";
 import { colorPalette, Background } from "./components/Utils/StyledComponents";
 import Toaster from "./components/Utils/Toaster";
+import { GlobalStyle } from './components/Utils/StyledComponents';
 
 function App() {
   const [membersList, setMembersList] = useState([]);
@@ -19,7 +20,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [userId, setUserId] = useState(0);
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(true);
   const [isDataReady, setIsDataReady] = useState(false);
 
   const getLoggedInUserId = () => {
@@ -105,6 +106,7 @@ function App() {
 
   return (
     <ThemeProvider theme={isDarkMode ? colorPalette.dark : colorPalette.light}>
+      <GlobalStyle />
       <Background>
         <Toaster />
         <AppContext.Provider value={provided}>
