@@ -41,7 +41,6 @@ const MemberData = ({ filteredMembers }) => {
 
         onClick={(member) => handleRowClick(member)}
       />
-      {/* </div> */}
       {selectedMember && (
         <div className="modal" style={
           { display: "block", 
@@ -52,8 +51,9 @@ const MemberData = ({ filteredMembers }) => {
           bottom: 0, 
           background: "rgba(0, 0, 0, 0.5)", 
           zIndex: 999,
-          backdropFilter: 'blur(4px)',
-          }}>
+          backdropFilter: 'blur(4px)'
+          }}
+        >
           <div style={{ position: "relative", top: "50%", left: "50%", transform: "translate(-50%, -50%)", background: "none", padding: "0px", maxWidth: "500px" }}>
             <MemberInfo memberId={selectedMember} closeModal={() => setSelectedMember(null)} />
           </div>

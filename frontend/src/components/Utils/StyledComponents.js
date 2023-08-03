@@ -53,7 +53,7 @@ export const Background = Styled.div`
 `;
 
 export const HeaderContainer = Styled.header`
-  transition: all 1s;
+  transition: background-color 1s;
   background-color: ${({ theme }) => theme.background};    
   color: ${({ theme }) => theme.text};
   flex-direction: row;
@@ -91,7 +91,7 @@ export const Subheading = Styled.header`
 
 export const Container = Styled.div`
   transition: all 1s;
-  background-color: ${({ theme }) => theme.background}E0;
+  background-color: ${({ theme }) => theme.background}D0;
   display: flex;
   flex-direction: column;
   padding: 2vw;
@@ -110,15 +110,14 @@ export const Input = Styled.input`
   margin-top: 1.5vh;
   margin-bottom: 1.5vh;
   outline: none;
-  border: none;
+  border: 1px solid ${({ theme }) => theme.border};
   padding: 1vh;
-  border-bottom: 1px solid ${({ theme }) => theme.border};
   min-height: 30px;
   width: 100%;
   color: ${({ theme }) => theme.text};
   background-color: ${({ theme }) => theme.background};
   border-radius: 10px;
-  `;
+`;
 
 export const Button = Styled.button`
   transition: all 1s;
