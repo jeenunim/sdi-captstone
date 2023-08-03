@@ -12,6 +12,7 @@ const MemberInfo = ({ memberId, closeModal }) => {
   const [status, setStatus] = useState();
   const [supervisor, setSupervisor] = useState();
   const [showModal, setShowModal] = useState(true);
+  const [ statusTypes, setStatusTypes ] = useState();
 
   useEffect(() => {
     if (memberId) {
@@ -55,6 +56,12 @@ const MemberInfo = ({ memberId, closeModal }) => {
         .catch(err => {
           console.error(err);
         });
+      fetch('http://localhost:8080/status_types')
+        .then(res => res.json())
+        .then(data => {
+          console.log(data.status_types);
+          setStatusTypes(data.status_types);
+        })
     }
   }, [memberId]);
 
@@ -70,19 +77,17 @@ const MemberInfo = ({ memberId, closeModal }) => {
   return (
     <Container>
       <CancelButton onClick={handleCloseModal}>&times;</CancelButton>
-      <Heading>Profile</Heading>
+      <Heading>{member ? `${member?.first_name} ${member?.last_name}` : 'Loading...'}</Heading>
       <Subheading>Account</Subheading>
       <Field name='Username' data={member?.username} />
       <Field name='Supervisor' data={supervisor && `${supervisor.first_name} ${supervisor.last_name}`} />
       <Divider />
       <Subheading>Personal</Subheading>
-      <Field name='First Name' data={member?.first_name} />
-      <Field name='Last Name' data={member?.last_name} />
       <Field name='Branch' data={branch?.name} />
       <Field name='Rank' data={rank?.title} />
       <Divider />
       <Subheading>Status</Subheading>
-      <Field name='Type' data={status?.type} />
+      <Field name='Type' data={statusTypes?.find(statusType => statusType.id === status?.status_type_id)?.name} />
       <Field name='Address' data={status?.address} />
       <Field name='Description' data={status?.description} />
     </Container>

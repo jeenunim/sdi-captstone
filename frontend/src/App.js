@@ -20,8 +20,9 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [userId, setUserId] = useState(0);
-  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const [isDataReady, setIsDataReady] = useState(false);
+  const [updateMembersList, setUpdateMembersList] = useState(false);
 
   const getLoggedInUserId = () => {
     if (document.cookie.length > 0) {
@@ -69,8 +70,18 @@ function App() {
     }
   }, [membersList, statusList, statusTypeList, userId]);
 
+  useEffect(() => {
+    if (updateMembersList) {
+      fetchData()
+      setUpdateMembersList(false);
+    }
+  }, [updateMembersList])
+
   if (isLoading) {
-    return <div>Loading...</div>;
+    return 
+    <Background>
+    <div>Loading...</div>;
+    </Background>
   }
 
   if (error) {
@@ -92,6 +103,8 @@ function App() {
     setUserId,
     isDarkMode,
     setIsDarkMode,
+    updateMembersList,
+    setUpdateMembersList
   };
 
   let homeLink = () => {

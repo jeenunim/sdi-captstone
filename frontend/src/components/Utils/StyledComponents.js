@@ -17,7 +17,8 @@ export const colorPalette = {
     background: '#FAFAFA',
     backgroundGradient: 'linear-gradient(#D6D9D2, #F3F3F3)',
     border: '#c9c9c9',
-    bodyBackground: '#F3F3F3'
+    bodyBackground: '#F3F3F3',
+    backgroundImage: `url('https://media.defense.gov/2020/Dec/10/2002550183/-1/-1/0/201210-F-GY993-002.JPG')`
   },
   dark: {
     primary: '#45532D',
@@ -25,17 +26,21 @@ export const colorPalette = {
     text: '#FAFAFA',
     secondaryText: '#303030',
     accent: '#E8A354',
-    background: '#303030',
+    background: '#101010',
     backgroundGradient: 'linear-gradient(#1A1A1D, #303030)',
     border: '#434343',
-    bodyBackground: '#303030'
+    bodyBackground: '#303030',
+    backgroundImage: `url('https://wallpapercrafter.com/sizes/1920x1080/285766-us-army-soldiers-army-men-waiting-aircraft.jpg')`
   }
 }
 
 export const GlobalStyle = createGlobalStyle`
   body {
-    background: ${({ theme }) => theme.backgroundGradient};
+
+    background: ${({ theme }) => theme.backgroundImage};
     background-attachment: fixed;
+    background-repeat: no-repeat;
+    background-size: cover;
   }
 `
 
@@ -48,12 +53,13 @@ export const Background = Styled.div`
 `;
 
 export const HeaderContainer = Styled.header`
+  transition: all 1s;
   background-color: ${({ theme }) => theme.background};    
   color: ${({ theme }) => theme.text};
   flex-direction: row;
   align-items: center;
   height: 60px;
-  box-shadow: 0px 0px 16px #0204;
+  box-shadow: 0px 0px 16px #0008;
   margin-bottom: 5vh;
   min-width: 100vw;
   align-item: stretch;
@@ -65,6 +71,7 @@ export const Divider = Styled.div`
 `;
 
 export const Heading = Styled.header`
+  transition: all 1s;
   color: ${({ theme }) => theme.text};
   font-size: xx-large;
   font-weight: light;
@@ -74,6 +81,7 @@ export const Heading = Styled.header`
 `;
 
 export const Subheading = Styled.header`
+  transition: all 1s;
   color: ${({ theme }) => theme.accent};
   font-size: x-large;
   text-align: center;
@@ -82,7 +90,8 @@ export const Subheading = Styled.header`
 `;
 
 export const Container = Styled.div`
-  background-color: ${({ theme }) => theme.background};
+  transition: all 1s;
+  background-color: ${({ theme }) => theme.background}E0;
   display: flex;
   flex-direction: column;
   padding: 2vw;
@@ -92,10 +101,12 @@ export const Container = Styled.div`
   justify-content: center;
   border-radius: 5px;
   margin: 1vw;
-  box-shadow: 0px 0px 10px #0202;
+  box-shadow: 0px 0px 10px #0006;
+  backdrop-filter: blur(15px);
 `;
 
 export const Input = Styled.input`
+  transition: all 1s;
   margin-top: 1.5vh;
   margin-bottom: 1.5vh;
   outline: none;
@@ -106,9 +117,11 @@ export const Input = Styled.input`
   width: 100%;
   color: ${({ theme }) => theme.text};
   background-color: ${({ theme }) => theme.background};
-`;
+  border-radius: 10px;
+  `;
 
 export const Button = Styled.button`
+  transition: all 1s;
   background-color: ${({ theme }) => theme.primary};
   text-align: center;
   border-radius: 10px;
@@ -127,6 +140,7 @@ export const Button = Styled.button`
 `;
 
 export const NavItem = Styled.div`
+  transition: all 0.25s; 
   color: ${({ theme }) => theme.text};
   display: inline-block;
   padding: 20px;
@@ -140,6 +154,7 @@ export const NavItem = Styled.div`
 `;
 
 export const Label = Styled.div`
+  transition: all 1s;
   text-align: center;
   cursor: pointer;
   color: ${({ theme }) => theme.text};
@@ -149,6 +164,7 @@ export const Label = Styled.div`
 `
 
 export const DarkThemeButton = Styled(DarkThemeIcon)`
+  transition: all 1s;
   cursor: pointer;
   height: 20px;
   &:hover {
@@ -159,6 +175,7 @@ export const DarkThemeButton = Styled(DarkThemeIcon)`
 `;
 
 export const LightThemeButton = Styled(LightThemeIcon)`
+  transition: all 1s;
   cursor: pointer;
   height: 20px;
   &:hover {
@@ -169,6 +186,7 @@ export const LightThemeButton = Styled(LightThemeIcon)`
 `;
 
 export const CancelButton = Styled(CancelIcon)`
+  transition: all 1s;
   cursor: pointer;
   path {
     stroke: ${({ theme }) => theme.text};
@@ -181,6 +199,7 @@ export const CancelButton = Styled(CancelIcon)`
 `;
 
 export const EditButton = Styled(EditIcon)`
+  transition: all 1s;
   cursor: pointer;
   path {
     stroke: ${({ theme }) => theme.text};
@@ -193,6 +212,7 @@ export const EditButton = Styled(EditIcon)`
 `;
 
 export const SaveButton = Styled(SaveIcon)`
+  transition: all 1s;
   cursor: pointer;
   path {
     stroke: ${({ theme }) => theme.text};
@@ -215,6 +235,7 @@ export const Field = (props) => {
   `;
 
   const FieldName = Styled.div`
+    transition: all 1s;
     grid-column: 1 / 2;
     color: ${({ theme }) => theme.text};
     font-weight: bold;
@@ -223,6 +244,7 @@ export const Field = (props) => {
   `;
 
   const FieldData = Styled.div`
+    transition: all 1s;
     grid-column: 2 / 3;
     color: ${({ theme }) => theme.text};
   `;
@@ -235,12 +257,13 @@ export const Field = (props) => {
   )
 }
 
-export const Table = ({ headers, rows }) => {
+export const Table = ({ headers, rows, onClick }) => {
   const StyledTable = Styled.table`
     border: none;
   `
 
   const StyledTableHeader = Styled.th`
+    transition: all 1s;
     color: ${colorPalette.light.secondaryText};
     background-color: ${({ theme }) => theme.primary};
     letter-spacing: 0.5px;
@@ -268,16 +291,24 @@ export const Table = ({ headers, rows }) => {
     padding: 5px;
   `;
 
+  const filteredHeaders = headers.slice(1);
+
   return (
     <StyledTable>
+      {/* Render headers without the first (id) column */}
       <StyledTableRow>
-        {headers.map(header => <StyledTableHeader>{header}</StyledTableHeader>)}
+        {filteredHeaders.map(header => <StyledTableHeader key={header}>{header}</StyledTableHeader>)}
       </StyledTableRow>
       {
-        rows.map(row => {
+        rows.map((row, rowIndex) => {
+          // Extract the id from the row data (assuming id is the first element in the row)
+          const id = row[0];
+          // Remove the first element (id) from the row array
+          const filteredRow = row.slice(1);
           return (
-            <StyledTableRow>
-              {row.map(column => <StyledTableData>{column}</StyledTableData>)}
+            // Attach the onRowClick event to each row individually
+            <StyledTableRow key={rowIndex} onClick={() => onClick(id)}>
+              {filteredRow.map((column, columnIndex) => <StyledTableData key={columnIndex}>{column}</StyledTableData>)}
             </StyledTableRow>
           )
         })
@@ -288,12 +319,15 @@ export const Table = ({ headers, rows }) => {
 
 export const Select = ({ optionsData, placeholder, defaultValue, onBlur }) => {
 
+  console.log('DefaulValue:', placeholder, ': ', defaultValue);
+
   const StyledSelect = Styled.select`
     margin-top: 1.5vh;
     margin-bottom: 1.5vh;
+    padding: 10px;
     color: ${({ theme }) => theme.text};
     background-color: ${({ theme }) => theme.background};
-    border-radius: 5px;
+    border-radius: 10px;
     border: 1px solid ${({ theme }) => theme.border};
   `;
 

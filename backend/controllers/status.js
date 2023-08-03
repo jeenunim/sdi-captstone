@@ -9,18 +9,14 @@ const getMemberStatus = (memberId) => {
   return getMember(memberId)
     .then(member => {
       return knex('status')
-        .join('status_type', 'status.status_type_id', 'status_type.id')
-        .select('status.id', 'status.address', 'status.description', 'status_type.name')
+        .select('*')
         .then(statuses => {
           const statusesFound = statuses.length > 0;
           if (statusesFound) {
             const statusId = member.status_id;
             const statusFound = statuses.find(status => status.id === statusId);
             if (statusFound) {
-              const { name, ...status } = statusFound;
-              status.type = name;
-              status.member_id = memberId;
-              status.status_type_id = statusId;
+              const status = statusFound;
               return status;
             } 
           } 

@@ -16,7 +16,7 @@ exports.up = function(knex) {
         table.string('office_symbol');
         table.integer('org_id');
         table.foreign('org_id').references('org.id');
-        table.integer('supervisor_id');
+        table.integer('supervisor_id').notNullable().defaultTo(1);
         table.integer('status_id');
         table.foreign('status_id').references('status.id');
         table.boolean('is_supervisor').notNullable().defaultTo(false);

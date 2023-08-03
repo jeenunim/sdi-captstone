@@ -35,7 +35,7 @@ const setRenderListData = () => {
         return {
           ...member,
           address: status.address,
-          status: status.type,
+          status: statusTypeList.find(statusType => status.status_type_id === statusType.id).name,
         };
       } else {
         return member;

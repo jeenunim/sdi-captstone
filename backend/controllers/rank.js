@@ -59,13 +59,7 @@ const getRanksByMilitaryBranch = (branchId) => {
 const getRanks = () => {
   return knex('rank')
     .select('*')
-    .join('branch', 'branch.id', 'rank.branch_id')
-    .then(joinedRanks => {
-      console.log(joinedRanks);
-      const ranks = joinedRanks.map(({name, ...rank}) => {
-        rank.branch = name;
-        return rank;
-      });
+    .then(ranks => {
       const ranksFound = ranks.length > 0;
       if (ranksFound) {
         return ranks;

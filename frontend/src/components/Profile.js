@@ -12,7 +12,7 @@ const ButtonMenu = Styled.div`
 
 const Profile = () => {
 
-  const { userId, setMembersList } = useContext(AppContext);
+  const { userId, setMembersList, setUpdateMembersList } = useContext(AppContext);
 
   const [ isEditMode, setIsEditMode ] = useState(false);
 
@@ -67,6 +67,7 @@ const Profile = () => {
       fetch(`http://localhost:8080/member/${userId}/status`)
         .then(res => res.json())
         .then(data => {
+          console.log('onAppMounted Status:', data.status);
           setStatus(data.status);
         })
         .catch(err => {
@@ -102,18 +103,11 @@ const Profile = () => {
       fetch('http://localhost:8080/status_types')
         .then(res => res.json())
         .then(data => {
+          console.log(data.status_types);
           setStatusTypes(data.status_types);
         })
     }
   }, []);
-
-  // useEffect(()=>{
-  //   fetch('http://localhost:8080/members')
-  //   .then(res => res.json())
-  //   .then(data => {
-  //     setMembersList(data.members);
-  //   })
-  // }, [member]);
 
   const handleSaveChanges = () => {
     fetch(`http://localhost:8080/member/${userId}/status`, {
@@ -130,7 +124,7 @@ const Profile = () => {
       })
       .then(res => res.json())
       .then(data => {
-        console.log(data);
+        console.log('Patched status: ', data.status);
         setStatus(data.status);
       })
       .catch(err => console.error(err));
@@ -171,6 +165,8 @@ const Profile = () => {
       .catch(err => console.error(err));
     
       toggleEditMode();
+      window.location.reload();
+      // setUpdateMembersList(true)
   }
 
   const toggleEditMode = () => setIsEditMode(!isEditMode);
@@ -292,18 +288,26 @@ const Profile = () => {
             name='Type' 
             data={
               <Select 
-                defaultValue={statusTypes?.find(statusType => statusType.id == status?.status_type_id)?.name}
                 placeholder='Select Status Type...' 
                 optionsData={statusTypes?.map(statusType => statusType.name)}
+                defaultValue={statusTypes?.find(statusType => statusType.id === status?.status_type_id)?.name}
                 required
                 onBlur={(event) => {
+                  console.log('status before:', status);
                   const statusTypeName = event.target.value;
-                  const statusTypeFound = statusTypes?.find(statusType => statusType.name == statusTypeName);
+                  console.log('statusTypeName:', statusTypeName);
+                  const statusTypeFound = statusTypes?.find(statusType => statusType.name === statusTypeName);
+                  console.log('statusTypeFound:', statusTypeFound);
                   const statusTypeId = statusTypeFound?.id;
+                  console.log('statusTypeId:', statusTypeId);
                   const { status_type_id, ...updatedStatus } = status;
+                  console.log('Removing status.status_type_id:', status_type_id);
+                  console.log('updatedStatus:', updatedStatus);
                   
                   updatedStatus.status_type_id = statusTypeId;
-
+                  console.log('updatedStatus.status_type_id:', updatedStatus.status_type_id);
+          
+                  console.log(updatedStatus);
                   setStatus(updatedStatus);
                 }}
               />
@@ -364,7 +368,7 @@ const Profile = () => {
           <Field name='Rank' data={rank?.title} />
           <Divider />
           <Subheading>Status</Subheading>
-          <Field name='Type' data={status?.type} />
+          <Field name='Type' data={statusTypes?.find(statusType => statusType.id === status?.status_type_id)?.name} />
           <Field name='Address' data={status?.address} />
           <Field name='Description' data={status?.description} />
         </>
